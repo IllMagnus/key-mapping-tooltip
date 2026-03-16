@@ -1,0 +1,42 @@
+{
+  "tooltips": [
+    {
+      "id": 1,
+      "x": 130,
+      "y": 150,
+      "text": "key a",
+      "color": "#ff0000",
+      "letter": "A",
+      "extra field": "extra value"
+    },
+    {
+      "id": 2,
+      "x": 353,
+      "y": 222,
+      "text": "key space",
+      "color": "#ff0000",
+      "letter": ""
+    },
+    {
+      "id": 3,
+      "x": 341,
+      "y": 227,
+      "text": "",
+      "color": "#ff0000",
+      "letter": ""
+    },
+    {
+      "id": 4,
+      "x": 246,
+      "y": 185,
+      "text": "vv",
+      "color": "#fb00ff",
+      "letter": "v"
+    }
+  ],
+  "image": {
+    "width": 600,
+    "height": 372,
+    "inverted": true
+  }
+}

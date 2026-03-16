@@ -1,0 +1,89 @@
+"""
+Script per raccogliere tutti i file di un progetto (HTML, JS, CSS)
+in un unico file di output con struttura organizzata.
+"""
+
+import sys
+from pathlib import Path
+
+# Configura UTF-8 per Windows
+if sys.platform == "win32":
+    import io
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+
+
+def collect_project_files(output_file="project_files.txt"):
+    """
+    Raccoglie index.html e tutti i file da js/ e styles/
+    e li trascrive in un unico file.
+    
+    Args:
+        output_file (str): Nome del file di output
+    """
+    
+    # Ottieni il percorso dello script
+    script_dir = Path(__file__).parent.absolute()
+    
+    # Definisci i percorsi
+    index_path = script_dir / "index.html"
+    js_dir = script_dir / "js"
+    styles_dir = script_dir / "styles"
+    
+    # Verifica che i percorsi esistano
+    if not index_path.exists():
+        print(f"❌ Errore: {index_path} non trovato")
+        return
+    
+    if not js_dir.exists():
+        print(f"⚠️  Attenzione: {js_dir} non trovato")
+    
+    if not styles_dir.exists():
+        print(f"⚠️  Attenzione: {styles_dir} non trovato")
+    
+    # Apri il file di output
+    with open(script_dir / output_file, "w", encoding="utf-8") as outfile:
+        outfile.write("tutti i file del progetto image-annotator:\n\n")
+        
+        # 1. Scrivi index.html
+        print("📝 Elaborazione index.html...")
+        outfile.write("====\n")
+        outfile.write("index.html\n")
+        outfile.write("----\n")
+        with open(index_path, "r", encoding="utf-8") as f:
+            outfile.write(f.read())
+        outfile.write("\n\n")
+        
+        # 2. Raccogli tutti i file JS in ordine alfabetico
+        if js_dir.exists():
+            js_files = sorted([f for f in js_dir.iterdir() if f.suffix == ".js"])
+            
+            for js_file in js_files:
+                print(f"📝 Elaborazione {js_file.name}...")
+                outfile.write("====\n")
+                outfile.write(f"js/{js_file.name}\n")
+                outfile.write("----\n")
+                with open(js_file, "r", encoding="utf-8") as f:
+                    outfile.write(f.read())
+                outfile.write("\n\n")
+        
+        # 3. Raccogli tutti i file CSS in ordine alfabetico
+        if styles_dir.exists():
+            css_files = sorted([f for f in styles_dir.iterdir() if f.suffix == ".css"])
+            
+            for css_file in css_files:
+                print(f"📝 Elaborazione {css_file.name}...")
+                outfile.write("====\n")
+                outfile.write(f"styles/{css_file.name}\n")
+                outfile.write("----\n")
+                with open(css_file, "r", encoding="utf-8") as f:
+                    outfile.write(f.read())
+                outfile.write("\n\n")
+    
+    output_path = script_dir / output_file
+    print(f"\n✅ File creato con successo: {output_path}")
+    print(f"📊 Dimensione: {output_path.stat().st_size:,} bytes")
+
+
+if __name__ == "__main__":
+    # Personalizza il nome del file di output se necessario
+    collect_project_files("progetto_completo.txt")

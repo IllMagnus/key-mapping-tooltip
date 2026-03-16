@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Immagine con Tooltip Interattivi</title>
+
+    <!-- Stili -->
+    <link rel="stylesheet" href="styles/variables.css" />
+    <link rel="stylesheet" href="styles/base.css" />
+    <link rel="stylesheet" href="styles/layout.css" />
+    <link rel="stylesheet" href="styles/components.css" />
+    <link rel="stylesheet" href="styles/tooltip.css" />
+    <link rel="stylesheet" href="styles/editor.css" />
+    <link rel="stylesheet" href="styles/manager.css" />
+    <link rel="stylesheet" href="styles/responsive.css" />
+  </head>
+  <body>
+    <div class="page-wrapper">
+      <div class="container">
+        <img src="assets/mk.jpg" alt="Immagine base" id="mainImage" />
+      </div>
+
+      <div class="controls-container">
+        <!-- SEZIONE TOOLTIP -->
+        <div class="control-section">
+          <h4 class="section-title">✏️ Tooltip</h4>
+          <div class="section-content">
+            <!-- Tooltip.add() - NESSUN event listener in app.js per questo -->
+            <button class="btn-primary" onclick="Tooltip.add()">
+              + Crea Tooltip
+            </button>
+
+            <div class="control-group">
+              <label>Colore:</label>
+              <input type="color" id="circleColor" value="#ff0000" />
+            </div>
+
+            <div class="control-group">
+              <label>Lettera:</label>
+              <input
+                type="text"
+                id="circleLetter"
+                maxlength="1"
+                value="A"
+                placeholder="A"
+                title="Lascia vuoto per nessun testo"
+              />
+            </div>
+
+            <div class="delete-zone" id="deleteZone">
+              <div class="delete-icon">🗑️</div>
+              <div class="delete-text">Trascina qui<br />per eliminare</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SEZIONE IMMAGINE -->
+        <div class="control-section">
+          <h4 class="section-title">🖼️ Immagine</h4>
+          <div class="section-content">
+            <!-- invertBtn - Rimosso onclick, usa event listener app.js -->
+            <button
+              class="btn-secondary"
+              id="invertBtn"
+            >
+              🔄 Inverti Colori
+            </button>
+
+            <!-- resizeToggleBtn - Rimosso onclick, usa event listener app.js -->
+            <button
+              class="btn-secondary"
+              id="resizeToggleBtn"
+            >
+              📐 Ridimensiona
+            </button>
+
+            <div id="resizePanel" class="editor-resize-panel hidden">
+              <div class="editor-resize-inputs">
+                <div class="editor-resize-input-group">
+                  <label for="widthInput">Larghezza (px):</label>
+                  <!-- widthInput - Rimosso oninput, usa event listener app.js -->
+                  <input
+                    type="number"
+                    id="widthInput"
+                    placeholder="Larghezza"
+                    min="1"
+                  />
+                </div>
+                <div class="editor-resize-input-group">
+                  <label for="heightInput">Altezza (px):</label>
+                  <!-- heightInput - Rimosso oninput, usa event listener app.js -->
+                  <input
+                    type="number"
+                    id="heightInput"
+                    placeholder="Altezza"
+                    min="1"
+                  />
+                </div>
+              </div>
+
+              <!-- lockProportionsBtn - Rimosso onclick, usa event listener app.js -->
+              <button
+                id="lockProportionsBtn"
+                class="editor-btn-lock"
+              >
+                🔓 Blocca Proporzioni
+              </button>
+
+              <div class="editor-resize-actions">
+                <!-- applyResizeBtn - ID aggiunto, rimosso onclick, usa event listener app.js -->
+                <button id="applyResizeBtn" class="editor-btn-apply">
+                  Applica
+                </button>
+                <!-- resetImageBtn - ID aggiunto, rimosso onclick, usa event listener app.js -->
+                <button
+                  id="resetImageBtn"
+                  class="editor-btn-reset"
+                >
+                  Resetta
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SEZIONE MANAGER -->
+        <div class="control-section">
+          <h4 class="section-title">💾 Manager</h4>
+          <div class="section-content">
+            <div class="tooltip-wrapper">
+              <!-- importBtn - Rimosso onclick, usa event listener app.js -->
+              <button
+                class="btn-manager btn-manager-import"
+                id="importBtn"
+              >
+                📥 Importa JSON
+              </button>
+              <div class="tooltip-text">
+                I file importati sovrascrivono l'attuale
+              </div>
+            </div>
+
+            <!-- exportBtn - ID aggiunto, rimosso onclick, usa event listener app.js -->
+            <button
+              class="btn-manager btn-manager-export"
+              id="exportBtn"
+            >
+              💾 Esporta JSON
+            </button>
+
+            <!-- exportCSVBtn - ID aggiunto, rimosso onclick, usa event listener app.js -->
+            <button
+              class="btn-manager btn-manager-export"
+              id="exportCSVBtn"
+            >
+              📊 Esporta CSV
+            </button>
+
+            <div class="tooltip-wrapper">
+              <!-- importCSVBtn - Rimosso onclick, usa event listener app.js -->
+              <button
+                class="btn-manager btn-manager-import"
+                id="importCSVBtn"
+              >
+                📥 Importa CSV
+              </button>
+              <div class="tooltip-text">
+                I file importati sovrascrivono l'attuale
+              </div>
+            </div>
+
+            <!-- clearAllBtn - Rimosso onclick, usa event listener app.js -->
+            <button
+              class="btn-manager btn-manager-new"
+              id="clearAllBtn"
+            >
+              🆕 Nuovo
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tooltips-overlay" id="tooltipsOverlay"></div>
+
+    <!-- Scripts - ORDINE -->
+    <script src="js/validators.js"></script>
+    <script src="js/core.js"></script>
+    <script src="js/toast.js"></script>
+    <script src="js/tooltip.js"></script>
+    <script src="js/image.js"></script>
+    <script src="js/manager.js"></script>
+    <!-- app.js ULTIMO - contiene event listener -->
+    <script src="js/app.js"></script>
+  </body>
+</html>

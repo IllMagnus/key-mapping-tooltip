@@ -1,0 +1,6 @@
+x,y,text,color,letter,extra field,pref
+130,150,key a,#ff0000,A,extra value,
+353,222,key space,#ff0000,,,
+341,227,,#ff0000,,,
+341,227,,#ff0000,,,prevalue
+246,185,vv,#fb00ff,v,,

@@ -1,0 +1,140 @@
+/* ============================================
+   TABLET & MOBILE BREAKPOINTS
+   ============================================ */
+
+/* Tablet: 768px and below */
+@media (max-width: 768px) {
+  /* Layout */
+  .controls-container {
+    grid-template-columns: 1fr;
+    margin-left: var(--space-sm);
+  }
+
+  .container {
+    margin-left: var(--space-sm);
+  }
+
+  /* Toast */
+  .toast-container {
+    bottom: var(--space-sm);
+    right: var(--space-sm);
+    left: var(--space-sm);
+  }
+
+  .toast {
+    min-width: auto;
+    width: 100%;
+  }
+
+  /* Tooltip text */
+  .tooltip-text {
+    white-space: normal;
+    width: 150px;
+    left: auto;
+    right: -20px;
+    transform: none;
+  }
+
+  .tooltip-text::after {
+    left: auto;
+    right: 10px;
+  }
+}
+
+/* Mobile: 600px and below */
+@media (max-width: 600px) {
+  body {
+    padding: var(--space-md);
+  }
+
+  .container {
+    margin-top: var(--space-lg);
+    margin-left: 0;
+  }
+
+  .controls-container {
+    margin-left: 0;
+    margin-top: var(--space-2xl);
+    gap: var(--space-xl);
+  }
+
+  img {
+    max-width: 100%;
+  }
+
+  /* Buttons */
+  button {
+    padding: 10px 12px;
+    font-size: var(--font-size-sm);
+  }
+
+  /* Editor panel */
+  .editor-resize-input-group {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .editor-resize-input-group label {
+    min-width: auto;
+  }
+
+  .editor-resize-input-group input {
+    width: 100%;
+  }
+
+  /* Toast */
+  .toast-container {
+    bottom: var(--space-sm);
+    right: var(--space-sm);
+    left: var(--space-sm);
+  }
+
+  .toast {
+    min-width: auto;
+    padding: 12px var(--space-lg);
+  }
+
+  .toast-icon {
+    display: none;
+  }
+}
+
+/* Small mobile: 400px and below */
+@media (max-width: 400px) {
+  body {
+    padding: var(--space-sm);
+  }
+
+  .control-section {
+    border-radius: var(--radius-md);
+  }
+
+  .section-title {
+    font-size: var(--font-size-base);
+    padding: var(--space-md) var(--space-lg);
+  }
+
+  .section-content {
+    padding: var(--space-lg);
+    gap: var(--space-md);
+  }
+
+  .control-group {
+    flex-wrap: wrap;
+  }
+
+  .control-group label {
+    min-width: 100%;
+    margin-bottom: var(--space-xs);
+  }
+
+  .toast {
+    min-width: auto;
+    font-size: var(--font-size-sm);
+    padding: 10px var(--space-md);
+  }
+
+  .toast-message {
+    font-size: var(--font-size-xs);
+  }
+}

@@ -1,0 +1,3426 @@
+tutti i file del progetto image-annotator:
+
+====
+index.html
+----
+<!DOCTYPE html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Immagine con Tooltip Interattivi</title>
+
+    <!-- Stili -->
+    <link rel="stylesheet" href="styles/variables.css" />
+    <link rel="stylesheet" href="styles/base.css" />
+    <link rel="stylesheet" href="styles/layout.css" />
+    <link rel="stylesheet" href="styles/components.css" />
+    <link rel="stylesheet" href="styles/tooltip.css" />
+    <link rel="stylesheet" href="styles/editor.css" />
+    <link rel="stylesheet" href="styles/manager.css" />
+    <link rel="stylesheet" href="styles/responsive.css" />
+  </head>
+  <body>
+    <div class="page-wrapper">
+      <div class="container">
+        <img src="assets/mk.jpg" alt="Immagine base" id="mainImage" />
+      </div>
+
+      <div class="controls-container">
+        <!-- SEZIONE TOOLTIP -->
+        <div class="control-section">
+          <h4 class="section-title">✏️ Tooltip</h4>
+          <div class="section-content">
+            <!-- Tooltip.add() - NESSUN event listener in app.js per questo -->
+            <button class="btn-primary" onclick="Tooltip.add()">
+              + Crea Tooltip
+            </button>
+
+            <div class="control-group">
+              <label>Colore:</label>
+              <input type="color" id="circleColor" value="#ff0000" />
+            </div>
+
+            <div class="control-group">
+              <label>Lettera:</label>
+              <input
+                type="text"
+                id="circleLetter"
+                maxlength="1"
+                value="A"
+                placeholder="A"
+                title="Lascia vuoto per nessun testo"
+              />
+            </div>
+
+            <div class="delete-zone" id="deleteZone">
+              <div class="delete-icon">🗑️</div>
+              <div class="delete-text">Trascina qui<br />per eliminare</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SEZIONE IMMAGINE -->
+        <div class="control-section">
+          <h4 class="section-title">🖼️ Immagine</h4>
+          <div class="section-content">
+            <!-- invertBtn - Rimosso onclick, usa event listener app.js -->
+            <button
+              class="btn-secondary"
+              id="invertBtn"
+            >
+              🔄 Inverti Colori
+            </button>
+
+            <!-- resizeToggleBtn - Rimosso onclick, usa event listener app.js -->
+            <button
+              class="btn-secondary"
+              id="resizeToggleBtn"
+            >
+              📐 Ridimensiona
+            </button>
+
+            <div id="resizePanel" class="editor-resize-panel hidden">
+              <div class="editor-resize-inputs">
+                <div class="editor-resize-input-group">
+                  <label for="widthInput">Larghezza (px):</label>
+                  <!-- widthInput - Rimosso oninput, usa event listener app.js -->
+                  <input
+                    type="number"
+                    id="widthInput"
+                    placeholder="Larghezza"
+                    min="1"
+                  />
+                </div>
+                <div class="editor-resize-input-group">
+                  <label for="heightInput">Altezza (px):</label>
+                  <!-- heightInput - Rimosso oninput, usa event listener app.js -->
+                  <input
+                    type="number"
+                    id="heightInput"
+                    placeholder="Altezza"
+                    min="1"
+                  />
+                </div>
+              </div>
+
+              <!-- lockProportionsBtn - Rimosso onclick, usa event listener app.js -->
+              <button
+                id="lockProportionsBtn"
+                class="editor-btn-lock"
+              >
+                🔓 Blocca Proporzioni
+              </button>
+
+              <div class="editor-resize-actions">
+                <!-- applyResizeBtn - ID aggiunto, rimosso onclick, usa event listener app.js -->
+                <button id="applyResizeBtn" class="editor-btn-apply">
+                  Applica
+                </button>
+                <!-- resetImageBtn - ID aggiunto, rimosso onclick, usa event listener app.js -->
+                <button
+                  id="resetImageBtn"
+                  class="editor-btn-reset"
+                >
+                  Resetta
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SEZIONE MANAGER -->
+        <div class="control-section">
+          <h4 class="section-title">💾 Manager</h4>
+          <div class="section-content">
+            <div class="tooltip-wrapper">
+              <!-- importBtn - Rimosso onclick, usa event listener app.js -->
+              <button
+                class="btn-manager btn-manager-import"
+                id="importBtn"
+              >
+                📥 Importa JSON
+              </button>
+              <div class="tooltip-text">
+                I file importati sovrascrivono l'attuale
+              </div>
+            </div>
+
+            <!-- exportBtn - ID aggiunto, rimosso onclick, usa event listener app.js -->
+            <button
+              class="btn-manager btn-manager-export"
+              id="exportBtn"
+            >
+              💾 Esporta JSON
+            </button>
+
+            <!-- exportCSVBtn - ID aggiunto, rimosso onclick, usa event listener app.js -->
+            <button
+              class="btn-manager btn-manager-export"
+              id="exportCSVBtn"
+            >
+              📊 Esporta CSV
+            </button>
+
+            <div class="tooltip-wrapper">
+              <!-- importCSVBtn - Rimosso onclick, usa event listener app.js -->
+              <button
+                class="btn-manager btn-manager-import"
+                id="importCSVBtn"
+              >
+                📥 Importa CSV
+              </button>
+              <div class="tooltip-text">
+                I file importati sovrascrivono l'attuale
+              </div>
+            </div>
+
+            <!-- clearAllBtn - Rimosso onclick, usa event listener app.js -->
+            <button
+              class="btn-manager btn-manager-new"
+              id="clearAllBtn"
+            >
+              🆕 Nuovo
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tooltips-overlay" id="tooltipsOverlay"></div>
+
+    <!-- Scripts - ORDINE -->
+    <script src="js/validators.js"></script>
+    <script src="js/core.js"></script>
+    <script src="js/toast.js"></script>
+    <script src="js/tooltip.js"></script>
+    <script src="js/image.js"></script>
+    <script src="js/manager.js"></script>
+    <!-- app.js ULTIMO - contiene event listener -->
+    <script src="js/app.js"></script>
+  </body>
+</html>
+
+
+====
+js/app.js
+----
+// ============================================
+// EVENT LISTENERS & INITIALIZATION
+// ============================================
+
+window.addEventListener("DOMContentLoaded", () => {
+  const img = getImageElement();
+
+  const savedTooltips = loadTooltipsFromStorage();
+
+  Editor.applyImageStyles({
+    width: StateManager.get("image.width"),
+    height: StateManager.get("image.height"),
+    inverted: StateManager.get("image.inverted"),
+  });
+
+  const btn = document.getElementById("lockProportionsBtn");
+  StateManager.set("editor.lockProportions", true);
+  btn.classList.add("editor-active");
+  btn.textContent = "🔒 Proporzioni Bloccate";
+
+  if (savedTooltips.length > 0) {
+    savedTooltips.forEach((tooltipData) => {
+      Tooltip.render(tooltipData);
+    });
+    showToast(`${savedTooltips.length} tooltip caricati`, "info");
+  }
+  Tooltip.dragHandler = Tooltip.drag.bind(Tooltip);
+  Tooltip.stopDragHandler = Tooltip.stopDrag.bind(Tooltip);
+
+  Manager.closeEditorUI() // è utile ??
+});
+
+document.addEventListener("mousemove", (e) => {
+  StateManager.set("ui.lastMouseX", e.clientX);
+  StateManager.set("ui.lastMouseY", e.clientY);
+});
+
+// ============================================
+// FASE 5: ORCHESTRAZIONE IMPORT
+// ============================================
+
+/**
+ * FASE 5: Import JSON handler
+ *
+ * Collega il bottone HTML a Manager.importTooltips()
+ *
+ * Flow:
+ * 1. User clicca bottone "Importa JSON"
+ * 2. Manager.importTooltips() apre file dialog
+ * 3. User seleziona .json
+ * 4. Manager processa:
+ *    - Backup stato attuale
+ *    - Parse JSON (validators.js)
+ *    - Apply image PRIMA (manager.js)
+ *    - Apply tooltip (manager.js)
+ *    - Salva localStorage
+ * 5. Se errore: Rollback atomico (manager.js)
+ */
+document.getElementById("importBtn")?.addEventListener("click", () => {
+  Manager.importTooltips();
+});
+
+/**
+ * FASE 5: Import CSV handler
+ *
+ * Collega il bottone HTML a Manager.importTooltipsCSV()
+ *
+ * Flow:
+ * 1. User clicca bottone "Importa CSV"
+ * 2. Manager.importTooltipsCSV() apre file dialog
+ * 3. User seleziona .csv
+ * 4. Manager processa:
+ *    - Backup stato attuale
+ *    - Parse CSV (validators.js)
+ *    - Apply tooltip (manager.js)
+ *    - Salva localStorage
+ * 5. Se errore: Rollback atomico (manager.js)
+ *
+ * Nota: CSV non contiene image data, quindi applyImageData() non viene chiamato
+ */
+document.getElementById("importCSVBtn")?.addEventListener("click", () => {
+  Manager.importTooltipsCSV();
+});
+
+// ============================================
+// FASE 6: ORCHESTRAZIONE EXPORT
+// ============================================
+
+/**
+ * FASE 6: Export JSON handler
+ *
+ * Collega il bottone HTML a Manager.exportTooltips()
+ *
+ * Flow:
+ * 1. User clicca bottone "Esporta JSON"
+ * 2. Manager.exportTooltips() processa:
+ *    - Ottiene tooltips da StateManager
+ *    - Formatta tooltip (FASE 4): rigenera ID 1,2,3..., arrotonda x,y
+ *    - Formatta image (FASE 4): se height="auto" → converti in numero
+ *    - Crea file JSON con Manager.createExportFile()
+ *    - Scarica file con Manager.downloadFile()
+ * 3. Browser scarica temp.json
+ * 4. Toast feedback di successo
+ */
+document.getElementById("exportBtn")?.addEventListener("click", () => {
+  Manager.exportTooltips();
+});
+
+/**
+ * FASE 6: Export CSV handler
+ *
+ * Collega il bottone HTML a Manager.exportTooltipsCSV()
+ *
+ * Flow:
+ * 1. User clicca bottone "Esporta CSV"
+ * 2. Manager.exportTooltipsCSV() processa:
+ *    - Ottiene tooltips da StateManager
+ *    - Formatta tooltip (FASE 4): rigenera ID 1,2,3..., arrotonda x,y
+ *    - Crea file CSV con Manager.createExportFile()
+ *    - Scarica file con Manager.downloadFile()
+ * 3. Browser scarica tooltips.csv
+ * 4. Toast feedback di successo
+ *
+ * Nota: CSV non include image data (non contiene colonne width, height, inverted)
+ */
+document.getElementById("exportCSVBtn")?.addEventListener("click", () => {
+  Manager.exportTooltipsCSV();
+});
+
+// ============================================
+// FASE 7: BUTTON HANDLERS & EDITOR INTEGRATION
+// ============================================
+
+/**
+ * FASE 7: Invert image handler
+ *
+ * Collega il bottone HTML a Editor.toggleInvert()
+ *
+ * Flow:
+ * 1. User clicca bottone "Inverti"
+ * 2. Editor.toggleInvert() processa:
+ *    - Legge stato attuale: image.inverted
+ *    - Inverte il valore (true → false, false → true)
+ *    - Applica filter CSS: "invert(1)" o "invert(0)"
+ *    - Aggiorna UI button class: aggiunge/rimuove "editor-active"
+ *    - Salva localStorage con saveTooltipsToStorage()
+ * 3. Toast feedback (opzionale, già nella logica inverted)
+ */
+document.getElementById("invertBtn")?.addEventListener("click", () => {
+  Editor.toggleInvert();
+});
+
+/**
+ * FASE 7: Resize mode toggle handler
+ *
+ * Collega il bottone HTML a Editor.toggleResizeMode()
+ *
+ * Flow:
+ * 1. User clicca bottone "Ridimensiona"
+ * 2. Editor.toggleResizeMode() processa:
+ *    - Legge stato attuale: editor.resizeModeActive
+ *    - Inverte il valore
+ *    - Se attivo: mostra panel, aggiorna input con dimensioni attuali
+ *    - Se inattivo: nasconde panel
+ *    - Aggiorna UI button class: aggiunge/rimuove "editor-active"
+ * 3. User può ora inserire larghezza/altezza
+ */
+document.getElementById("resizeToggleBtn")?.addEventListener("click", () => {
+  Editor.toggleResizeMode();
+});
+
+/**
+ * FASE 7: Lock proportions toggle handler
+ *
+ * Collega il bottone HTML a Editor.toggleLockProportions()
+ *
+ * Flow:
+ * 1. User clicca bottone "Blocca/Sblocca Proporzioni"
+ * 2. Editor.toggleLockProportions() processa:
+ *    - Legge stato attuale: editor.lockProportions
+ *    - Inverte il valore
+ *    - Se bloccato: aggiorna aspect ratio dalla width e height attuali
+ *    - Se sbloccato: text diventa "🔓 Blocca Proporzioni"
+ *    - Aggiorna UI button class e testo
+ * 3. Quando è bloccato, cambiare width → height si adatta automaticamente
+ */
+document.getElementById("lockProportionsBtn")?.addEventListener("click", () => {
+  Editor.toggleLockProportions();
+});
+
+/**
+ * FASE 7: Width input change handler
+ *
+ * Collega l'input HTML a Editor.handleWidthChange()
+ *
+ * Flow:
+ * 1. User cambia valore width input (es: 500 px)
+ * 2. Editor.handleWidthChange() processa:
+ *    - Se proportions BLOCCATE:
+ *      - Calcola: newHeight = width / aspectRatio
+ *      - Aggiorna height input con il nuovo valore
+ *    - Se proportions SBLOCCATE:
+ *      - Nulla (height rimane indipendente)
+ * 3. User vede height aggiornato in real-time
+ */
+document.getElementById("widthInput")?.addEventListener("input", () => {
+  Editor.handleWidthChange();
+});
+
+/**
+ * FASE 7: Height input change handler
+ *
+ * Collega l'input HTML a Editor.handleHeightChange()
+ *
+ * Flow:
+ * 1. User cambia valore height input (es: 300 px)
+ * 2. Editor.handleHeightChange() processa:
+ *    - Se proportions BLOCCATE:
+ *      - Calcola: newWidth = height * aspectRatio
+ *      - Aggiorna width input con il nuovo valore
+ *    - Se proportions SBLOCCATE:
+ *      - Nulla (width rimane indipendente)
+ * 3. User vede width aggiornato in real-time
+ */
+document.getElementById("heightInput")?.addEventListener("input", () => {
+  Editor.handleHeightChange();
+});
+
+/**
+ * FASE 7: Apply resize handler
+ *
+ * Collega il bottone HTML a Editor.applyResize()
+ *
+ * Flow:
+ * 1. User clicca bottone "Applica Dimensioni"
+ * 2. Editor.applyResize() processa:
+ *    - Legge width e height dagli input
+ *    - Valida le dimensioni con validateImageDimensions()
+ *    - Se height="auto": applica solo width
+ *    - Se height numerica: applica entrambi
+ *    - Aggiorna DOM style: img.style.width, img.style.height
+ *    - Aggiorna StateManager: image.width, image.height
+ *    - Salva localStorage
+ * 3. Toast: "Dimensioni applicate"
+ */
+document.getElementById("applyResizeBtn")?.addEventListener("click", () => {
+  Editor.applyResize();
+});
+
+/**
+ * FASE 7: Reset image size handler
+ *
+ * Collega il bottone HTML a Editor.resetImageSize()
+ *
+ * Flow:
+ * 1. User clicca bottone "Ripristina Dimensioni"
+ * 2. Editor.resetImageSize() processa:
+ *    - Resetta immagine a default: width="100%", height="auto", maxWidth="880px"
+ *    - Legge dimensioni attuali dal DOM con offsetWidth/offsetHeight
+ *    - Aggiorna input width e height
+ *    - Aggiorna StateManager: image.width, image.height
+ *    - Salva localStorage
+ * 3. Toast: "Dimensioni ripristinate"
+ */
+document.getElementById("resetImageBtn")?.addEventListener("click", () => {
+  Editor.resetImageSize();
+});
+
+/**
+ * FASE 7: Clear all handler
+ *
+ * Collega il bottone HTML a Manager.clearAll()
+ *
+ * Flow:
+ * 1. User clicca bottone "Cancella Tutto"
+ * 2. Manager.clearAll() processa:
+ *    - FIRST CLICK: isWaitingForConfirmation = true
+ *      - Mostra toast: "Clicca di nuovo entro 2 secondi per confermare"
+ *      - Imposta timeout di 2 secondi per reset
+ *    - SECOND CLICK (entro 2 secondi):
+ *      - Cancella timeout
+ *      - isWaitingForConfirmation = false
+ *      - Rimuove tutti i tooltip dal DOM (overlay.innerHTML = "")
+ *      - SVUOTA STATE: tooltips = [], tooltipIdCounter = 0
+ *      - Salva localStorage
+ *      - Toast: "Tutti i tooltip sono stati eliminati"
+ *    - Se 2 secondi passano senza secondo click:
+ *      - Reset stato
+ *      - Toast: "Azione annullata"
+ * 3. User vede overlay vuoto e state sincronizzato
+ */
+document.getElementById("clearAllBtn")?.addEventListener("click", () => {
+  Manager.clearAll();
+});
+
+
+====
+js/core.js
+----
+// ============================================
+// UTILITY FUNCTIONS
+// ============================================
+
+function getImageElement() {
+  return document.getElementById("mainImage");
+}
+
+function getImageCenters() {
+  const imgRect = getImageElement().getBoundingClientRect();
+
+  // 1. Centro relativo alla Viewport (la finestra visibile del browser)
+  const centerViewportX = imgRect.left + imgRect.width / 2;
+  const centerViewportY = imgRect.top + imgRect.height / 2;
+
+  // 2. Centro assoluto rispetto al Documento (include lo scroll)
+  const centerX = centerViewportX + window.scrollX;
+  const centerY = centerViewportY + window.scrollY;
+
+  return {
+    centerX,
+    centerY
+  };
+}
+
+function getOverlay() {
+  return document.getElementById("tooltipsOverlay");
+}
+
+function sanitizeText(text, maxLength) {
+  return text
+    .replace(/[^a-zA-Z0-9\s]/g, "")
+    .substring(0, maxLength)
+    .trim();
+}
+
+// csv
+function getRequiredFields() {
+  return ["x", "y", "text", "color", "letter"];
+}
+
+// ============================================
+// STATE MANAGER
+// ============================================
+
+const StateManager = (() => {
+  const AppState = {
+    tooltips: [],
+    image: {
+      inverted: false,
+      width: null,
+      height: null,
+      aspectRatio: 1,
+    },
+    editor: {
+      resizeModeActive: false,
+      lockProportions: true,
+    },
+    ui: {
+      draggingTooltip: null,
+      offsetX: 0,
+      offsetY: 0,
+      tooltipIdCounter: 0,
+      lastMouseX: 0,
+      lastMouseY: 0,
+    },
+  };
+
+  const subscribers = [];
+
+  return {
+    /**
+     * Legge un valore dallo state usando notazione con punto (es: "image.width")
+     * @param {string} path - Percorso del valore (es: "ui.tooltipIdCounter")
+     * @returns {any} Il valore nello state
+     */
+    get(path) {
+      const keys = path.split(".");
+      let current = AppState;
+
+      for (const key of keys) {
+        current = current[key];
+      }
+
+      return current;
+    },
+
+    /**
+     * Modifica un valore dello state e notifica tutti i subscriber
+     * @param {string} path - Percorso del valore (es: "ui.tooltipIdCounter")
+     * @param {any} value - Nuovo valore
+     */
+    set(path, value) {
+      const keys = path.split(".");
+      let current = AppState;
+
+      // Naviga fino al penultimo livello
+      for (let i = 0; i < keys.length - 1; i++) {
+        current = current[keys[i]];
+      }
+
+      // Prendi il vecchio valore per il callback
+      const oldValue = current[keys[keys.length - 1]];
+
+      // Assegna il nuovo valore
+      current[keys[keys.length - 1]] = value;
+
+      // NOTIFICA: Dì a tutti i subscriber che qualcosa è cambiato
+      subscribers.forEach((callback) => {
+        try {
+          callback({
+            path,
+            oldValue,
+            newValue: value,
+            timestamp: Date.now(),
+          });
+        } catch (e) {
+          console.error("Errore nel subscriber:", e);
+        }
+      });
+    },
+
+    /**
+     * Registra una funzione che viene chiamata quando lo state cambia
+     * @param {function} callback - Funzione da chiamare al cambio dello state
+     * @returns {function} Funzione per unsubscribe
+     */
+    subscribe(callback) {
+      if (typeof callback !== "function") {
+        console.warn("Subscribe richiede una funzione come parametro");
+        return () => {};
+      }
+
+      subscribers.push(callback);
+
+      // Ritorna funzione per unsubscribe
+      return () => {
+        const index = subscribers.indexOf(callback);
+        if (index > -1) {
+          subscribers.splice(index, 1);
+        }
+      };
+    },
+
+    /**
+     * Debug: Ritorna una copia dell'intero state (READ ONLY)
+     * @returns {object} Copia dello state
+     */
+    getDebug() {
+      return JSON.parse(JSON.stringify(AppState));
+    },
+  };
+})();
+
+// ============================================
+// STORAGE MANAGEMENT
+// ============================================
+
+function saveTooltipsToStorage() {
+  const tooltips = StateManager.get("tooltips");
+
+  // Valida le dimensioni prima di salvare
+  let width = StateManager.get("image.width");
+  let height = StateManager.get("image.height");
+  const validated = validateImageDimensions(width, height);
+
+  const imageState = {
+    width: validated.width,
+    height: validated.height,
+    inverted: StateManager.get("image.inverted"),
+  };
+
+  const data = {
+    tooltips: tooltips,
+    image: imageState,
+  };
+
+  localStorage.setItem("temp-tooltips", JSON.stringify(data));
+}
+
+function loadTooltipsFromStorage() {
+  const stored = localStorage.getItem("temp-tooltips");
+  if (stored) {
+    try {
+      const data = JSON.parse(stored);
+
+      // Carica i tooltip
+      const tooltips = data.tooltips || [];
+      StateManager.set("tooltips", tooltips);
+
+      // Carica e valida le dimensioni e lo stato dell'immagine
+      if (data.image) {
+        let width = data.image.width;
+        let height = data.image.height;
+
+        const validated = validateImageDimensions(width, height);
+        StateManager.set("image.width", validated.width);
+        StateManager.set("image.height", validated.height);
+
+        if (data.image.inverted !== undefined)
+          StateManager.set("image.inverted", data.image.inverted);
+      }
+
+      // Ricalcola l'ID counter basato sui tooltip caricati
+      if (tooltips.length > 0) {
+        const maxId = Math.max(...tooltips.map((t) => t.id));
+        StateManager.set("ui.tooltipIdCounter", maxId);
+      }
+
+      return tooltips;
+    } catch (e) {
+      console.error("Errore nel caricamento dei tooltip:", e);
+      return [];
+    }
+  }
+  return [];
+}
+
+
+====
+js/image.js
+----
+// ============================================
+// EDITOR MODULE
+// ============================================
+
+const Editor = {
+  applyImageInvert(invert, img) {
+    const btn = document.getElementById("invertBtn");
+    if (invert) {
+      img.style.filter = "invert(1)";
+      btn.classList.add("editor-active");
+    } else {
+      img.style.filter = "invert(0)";
+      btn.classList.remove("editor-active");
+    }
+    StateManager.set("image.inverted", invert);
+  },
+
+  /**
+   * FONTE DI VERITÀ per l'applicazione di styling all'immagine
+   * Gestisce: dimensioni (width, height) + inverted + UI + StateManager
+   *
+   * @param {object} imageData - {width?, height?, inverted?}
+   *   - width/height: number | null | undefined (null/undefined = reset)
+   *   - inverted: boolean (opzionale)
+   * @throws {Error} se validazione fallisce
+   * @side-effects: DOM, StateManager, input HTML
+   * @returns: undefined
+   */
+  applyImageStyles(imageData) {
+    imageData = imageData || {};
+    const img = getImageElement();
+
+    // PUNTO 1: Normalizza width e height
+    let width = normalizeFieldValue("width", imageData.width);
+    let height = normalizeFieldValue("height", imageData.height);
+
+    // PUNTO 2: Valida e calcola dimensioni mancanti
+    // Ottieni dimensioni originali dall'immagine
+    const originalWidth = img.naturalWidth;
+    const originalHeight = img.naturalHeight;
+    const originalAspectRatio = originalWidth / originalHeight;
+
+    // Caso 1: entrambi null → reset completo a dimensioni originali
+    if (width === null && height === null) {
+      width = originalWidth;
+      height = originalHeight;
+    }
+    // Caso 2: width numero, height null → calcola height da ratio
+    else if (width !== null && height === null)
+      height = Math.round(width / originalAspectRatio);
+    // Caso 3: height numero, width null → calcola width da ratio
+    else if (width === null && height !== null)
+      width = Math.round(height * originalAspectRatio);
+    // Caso 4: entrambi numero → usali come-è (già positivi dopo normalizzazione)
+
+    // PUNTO 3: Applica DOM styling
+    img.style.width = width + "px";
+    img.style.height = height + "px";
+    img.style.maxWidth = "none";
+
+    // PUNTO 4: Applica inverted (se definito)
+    // PUNTO 5: Aggiorna StateManager
+    if (imageData.inverted !== undefined)
+      this.applyImageInvert(imageData.inverted, img);
+    StateManager.set("image.width", width);
+    StateManager.set("image.height", height);
+
+    // PUNTO 6: Ricalcola aspect ratio da dimensioni ATTUALI (dopo render)
+    const currentWidth = img.offsetWidth;
+    const currentHeight = img.offsetHeight;
+    const currentAspectRatio = currentWidth / currentHeight;
+    StateManager.set("image.aspectRatio", currentAspectRatio);
+
+    // PUNTO 7: Aggiorna input HTML se panel visibile
+    if (StateManager.get("editor.resizeModeActive")) {
+      document.getElementById("widthInput").value = Math.round(currentWidth);
+      document.getElementById("heightInput").value = Math.round(currentHeight);
+    }
+  },
+
+  toggleInvert() {
+    try {
+      const inverted = StateManager.get("image.inverted");
+      this.applyImageInvert(!inverted, getImageElement());
+      saveTooltipsToStorage();
+      showToast("Immagine invertita", "success");
+    } catch (error) {
+      showToast("Errore durante inversione: " + error.message, "error");
+    }
+  },
+
+  toggleResizeMode() {
+    const resizeModeActive = StateManager.get("editor.resizeModeActive");
+    StateManager.set("editor.resizeModeActive", !resizeModeActive);
+
+    const panel = document.getElementById("resizePanel");
+    const btn = document.getElementById("resizeToggleBtn");
+    const img = getImageElement();
+
+    if (!resizeModeActive) {
+      panel.classList.remove("hidden");
+      btn.classList.add("editor-active");
+
+      const currentWidth = img.offsetWidth;
+      const currentHeight = img.offsetHeight;
+
+      document.getElementById("widthInput").value = currentWidth;
+      document.getElementById("heightInput").value = currentHeight;
+    } else {
+      panel.classList.add("hidden");
+      btn.classList.remove("editor-active");
+    }
+  },
+
+  toggleLockProportions() {
+    const lockProportions = StateManager.get("editor.lockProportions");
+    StateManager.set("editor.lockProportions", !lockProportions);
+
+    const btn = document.getElementById("lockProportionsBtn");
+    const img = getImageElement();
+
+    if (lockProportions) {
+      btn.classList.remove("editor-active");
+      btn.textContent = "🔓 Blocca Proporzioni";
+    } else {
+      btn.classList.add("editor-active");
+      btn.textContent = "🔒 Proporzioni Bloccate";
+
+      const currentWidth = parseFloat(
+        document.getElementById("widthInput").value
+      );
+      const currentHeight = parseFloat(
+        document.getElementById("heightInput").value
+      );
+      StateManager.set("image.aspectRatio", currentWidth / currentHeight);
+    }
+  },
+
+  handleWidthChange() {
+    const lockProportions = StateManager.get("editor.lockProportions");
+    if (!lockProportions) return;
+
+    const widthInput = document.getElementById("widthInput");
+    const heightInput = document.getElementById("heightInput");
+    const aspectRatio = StateManager.get("image.aspectRatio");
+
+    const newWidth = parseFloat(widthInput.value);
+    const newHeight = Math.round(newWidth / aspectRatio);
+
+    heightInput.value = newHeight;
+  },
+
+  handleHeightChange() {
+    const lockProportions = StateManager.get("editor.lockProportions");
+    if (!lockProportions) return;
+
+    const widthInput = document.getElementById("widthInput");
+    const heightInput = document.getElementById("heightInput");
+    const aspectRatio = StateManager.get("image.aspectRatio");
+
+    const newHeight = parseFloat(heightInput.value);
+    const newWidth = Math.round(newHeight * aspectRatio);
+
+    widthInput.value = newWidth;
+  },
+
+  applyResize() {
+    try {
+      let width = document.getElementById("widthInput").value;
+      let height = document.getElementById("heightInput").value;
+
+      // Normalizza e Applica styling (delegati a applyImageStyles)
+      this.applyImageStyles({ width, height });
+
+      // Se no errore
+      Manager.closeEditorUI();
+      saveTooltipsToStorage();
+      showToast("Dimensioni applicate", "success");
+    } catch (error) {
+      showToast("Errore: " + error.message, "error");
+    }
+  },
+
+  resetImageSize() {
+    try {
+      // Passa null per entrambi → trigger reset a dimensioni originali
+      this.applyImageStyles({ width: null, height: null });
+
+      // Se no errore
+      Manager.closeEditorUI();
+      saveTooltipsToStorage();
+      showToast("Dimensioni ripristinate", "success");
+    } catch (error) {
+      showToast("Errore durante reset: " + error.message, "error");
+    }
+  },
+};
+
+
+====
+js/manager.js
+----
+// ============================================
+// MANAGER MODULE
+// ============================================
+
+const Manager = {
+  clearAllState: {
+    isWaitingForConfirmation: false,
+    timeoutId: null,
+  },
+
+  // ============================================
+  // STATE BACKUP & RESTORE
+  // ============================================
+
+  /**
+   * Crea un backup profondo dello stato attuale
+   * Copre: tooltips[], image.*, editor.*, ui.tooltipIdCounter
+   * @returns {object} Backup completo dello stato
+   */
+  createStateBackup() {
+    return {
+      tooltips: JSON.parse(JSON.stringify(StateManager.get("tooltips"))),
+      image: {
+        width: StateManager.get("image.width"),
+        height: StateManager.get("image.height"),
+        inverted: StateManager.get("image.inverted"),
+        aspectRatio: StateManager.get("image.aspectRatio"),
+      },
+      editor: {
+        resizeModeActive: StateManager.get("editor.resizeModeActive"),
+        lockProportions: StateManager.get("editor.lockProportions"),
+      },
+      ui: {
+        tooltipIdCounter: StateManager.get("ui.tooltipIdCounter"),
+      },
+    };
+  },
+
+  /**
+   * Applica i tooltip importati allo stato e al DOM
+   * ORDINE: State FIRST (svuota), poi applica, poi render
+   * SVUOTA STATE PRIMO (CRUCIALE PER ROLLBACK ATOMICO)
+   * @param {array} tooltips - Array tooltip normalizzati
+   */
+  applyImportedTooltips(tooltips) {
+    // Rimuovi tooltip VECCHI dal DOM (pulizia completa)
+    const oldTooltips = StateManager.get("tooltips");
+    oldTooltips.forEach((tooltip) => {
+      const pointEl = document.getElementById(`point-${tooltip.id}`);
+      const textEl = document.getElementById(`text-${tooltip.id}`);
+
+      if (pointEl) pointEl.remove(); // Rimuove completamente, listener automaticamente rimossi
+      if (textEl) textEl.remove();
+    });
+
+    // SVUOTA STATE PRIMA
+    // Se accade un errore, lo state rimarrà pulito per rollback atomico
+    StateManager.set("tooltips", []);
+    StateManager.set("ui.tooltipIdCounter", 0);
+
+    // Applica nuovi tooltip allo state
+    StateManager.set("tooltips", tooltips);
+
+    // Ricalcola tooltipIdCounter dal massimo ID importato
+    if (tooltips.length > 0) {
+      const maxId = Math.max(...tooltips.map((t) => t.id));
+      StateManager.set("ui.tooltipIdCounter", maxId);
+    }
+
+    // RENDER nuovi tooltip nel DOM
+    // Se errore qui, state è coerente (già aggiornato)
+    tooltips.forEach((tooltip) => {
+      Tooltip.render(tooltip);
+    });
+  },
+
+  /**
+   * Ripristina lo stato completo dal backup (ROLLBACK ATOMICO)
+   * Ripristina: State → DOM → UI buttons
+   * @param {object} backup - Backup creato da createStateBackup()
+   */
+  restoreStateBackup(backup) {
+    // Ripristina STATE
+    StateManager.set("tooltips", JSON.parse(JSON.stringify(backup.tooltips)));
+    StateManager.set("image.width", backup.image.width);
+    StateManager.set("image.height", backup.image.height);
+    StateManager.set("image.inverted", backup.image.inverted);
+    StateManager.set("image.aspectRatio", backup.image.aspectRatio);
+    StateManager.set("editor.resizeModeActive", backup.editor.resizeModeActive);
+    StateManager.set("editor.lockProportions", backup.editor.lockProportions);
+    StateManager.set("ui.tooltipIdCounter", backup.ui.tooltipIdCounter);
+
+    // Ripristina DOM (rimuovi tutti gli elementi)
+    const overlay = getOverlay();
+    if (overlay) overlay.innerHTML = ""; // Pulisci tutti i tooltip
+
+    // Re-render tooltip dal backup
+    backup.tooltips.forEach((tooltip) => {
+      Tooltip.render(tooltip);
+    });
+
+    // Ripristina UI state (immagine)
+    Editor.applyImageStyles(backup.image);
+
+    // Ripristina UI buttons
+    const resizeToggleBtn = document.getElementById("resizeToggleBtn");
+    const resizePanel = document.getElementById("resizePanel");
+
+    if (backup.editor.resizeModeActive) {
+      resizePanel.classList.remove("hidden");
+      resizeToggleBtn.classList.add("editor-active");
+    } else {
+      resizePanel.classList.add("hidden");
+      resizeToggleBtn.classList.remove("editor-active");
+    }
+
+    const lockBtn = document.getElementById("lockProportionsBtn");
+    if (backup.editor.lockProportions) {
+      lockBtn.classList.add("editor-active");
+      lockBtn.textContent = "🔒 Proporzioni Bloccate";
+    } else {
+      lockBtn.classList.remove("editor-active");
+      lockBtn.textContent = "🔓 Blocca Proporzioni";
+    }
+  },
+
+  /**
+   * Chiude UI del resize panel
+   */
+  closeEditorUI() {
+    const resizePanel = document.getElementById("resizePanel");
+    const resizeToggleBtn = document.getElementById("resizeToggleBtn");
+
+    if (!resizePanel.classList.contains("hidden")) {
+      resizePanel.classList.add("hidden");
+      resizeToggleBtn.classList.remove("editor-active");
+      StateManager.set("editor.resizeModeActive", false);
+    }
+  },
+
+  // ============================================
+  // FORMATTING EXPORT
+  // ============================================
+
+  /**
+   * Formatta tooltip per export
+   * - Rigenera ID sequenziali 1,2,3,... (risolve gaps)
+   * - Arrotonda coordinate x,y
+   * - Mantiene tutti i campi richiesti e opzionali
+   * @param {array} tooltips - Array tooltip da formattare
+   * @returns {array} Array tooltip formattati per export
+   */
+  formatTooltipsForExport(tooltips) {
+    return tooltips.map((tooltip, index) => {
+      const formatted = {};
+      const requiredFields = getRequiredFields();
+
+      // RIGENERA ID SEQUENZIALE
+      formatted.id = index + 1;
+      // Aggiungi campi richiesti
+      requiredFields.forEach((field) => {
+        let value = tooltip[field];
+        // Arrotonda coordinate x, y
+        if ((field === "x" || field === "y") && typeof value === "number") {
+          value = Math.round(value);
+        }
+        formatted[field] = value;
+      });
+
+      // Aggiungi campi opzionali (non vuoti)
+      for (const key in tooltip) {
+        if (key !== "id" && !requiredFields.includes(key)) {
+          const value = tooltip[key];
+
+          if (value !== "" && value !== null && value !== undefined) {
+            formatted[key] = value;
+          }
+        }
+      }
+
+      return formatted;
+    });
+  },
+
+  /**
+   * Formatta dati immagine per export
+   * - Se height è stringa ("auto"), converte in numero usando aspect ratio
+   * - Arrotonda entrambe le dimensioni
+   * - Mantiene stato inverted
+   * @param {object} imageData - Dati immagine da formattare {width, height, inverted, aspectRatio}
+   * @returns {object} Dati immagine formattati {width, height, inverted}
+   */
+  formatImageDataForExport(imageData) {
+    if (!imageData) {
+      return null;
+    }
+
+    let width = imageData.width;
+    let height = imageData.height;
+    const inverted = imageData.inverted || false;
+    const aspectRatio = imageData.aspectRatio || 1;
+
+    // Gestisci height = "auto": converti in numero usando aspect ratio
+    if (height === "auto") {
+      // height = width / aspectRatio
+      height = Math.round(width / aspectRatio);
+    }
+
+    // Arrotonda entrambe le dimensioni
+    const exportWidth = typeof width === "number" ? Math.round(width) : width;
+    const exportHeight =
+      typeof height === "number" ? Math.round(height) : height;
+
+    return {
+      width: exportWidth,
+      height: exportHeight,
+      inverted: inverted,
+    };
+  },
+
+  /**
+   * Crea file di export (wrapper per JSON o CSV)
+   * @param {string} format - "json" o "csv"
+   * @param {array} tooltips - Array tooltip formattati
+   * @param {object} imageData - Dati immagine formattati
+   * @returns {string} Contenuto del file (JSON o CSV)
+   */
+  createExportFile(format, tooltips, imageData) {
+    if (format === "json") {
+      const exportData = {
+        tooltips: tooltips,
+        image: imageData,
+      };
+      return JSON.stringify(exportData, null, 2);
+    } else if (format === "csv") {
+      // CSV: usa tooltipsToCSV() da validators.js
+      // Non include image data
+      return tooltipsToCSV(tooltips);
+    } else {
+      throw new Error(`Formato export non supportato: ${format}`);
+    }
+  },
+
+  /**
+   * Scarica file dal browser
+   * @param {string} content - Contenuto del file
+   * @param {string} filename - Nome file (es: "temp.json", "tooltips.csv")
+   * @param {string} mimeType - MIME type (es: "application/json", "text/csv")
+   */
+  downloadFile(content, filename, mimeType) {
+    const dataUri =
+      `data:${mimeType};charset=utf-8,` + encodeURIComponent(content);
+
+    const linkElement = document.createElement("a");
+    linkElement.setAttribute("href", dataUri);
+    linkElement.setAttribute("download", filename);
+    linkElement.click();
+  },
+
+  // ============================================
+  // JSON EXPORT/IMPORT
+  // ============================================
+
+  exportTooltips() {
+    const tooltips = StateManager.get("tooltips");
+
+    if (tooltips.length === 0) {
+      showToast("Nessun tooltip da esportare", "warning");
+      return;
+    }
+
+    // Formatta tooltip
+    const formattedTooltips = this.formatTooltipsForExport(tooltips);
+
+    // Formatta immagine
+    const imageData = {
+      width: StateManager.get("image.width"),
+      height: StateManager.get("image.height"),
+      inverted: StateManager.get("image.inverted"),
+      aspectRatio: StateManager.get("image.aspectRatio"),
+    };
+    const formattedImage = this.formatImageDataForExport(imageData);
+
+    // Crea file JSON
+    const fileContent = this.createExportFile(
+      "json",
+      formattedTooltips,
+      formattedImage
+    );
+
+    // Scarica
+    this.downloadFile(fileContent, "temp.json", "application/json");
+
+    showToast(
+      `${formattedTooltips.length} tooltip esportati in temp.json`,
+      "success"
+    );
+  },
+
+  importTooltips() {
+    const fileInput = document.createElement("input");
+    fileInput.type = "file";
+    fileInput.accept = ".json";
+
+    fileInput.addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        // BACKUP: Salva stato attuale PRIMA di qualunque modifica
+        const stateBackup = this.createStateBackup();
+
+        try {
+          // PARSE JSON
+          const jsonText = event.target.result;
+          const parsedData = parseJSONTooltips(jsonText);
+
+          // Apply: Immagine PRIMA dei tooltip
+          Editor.applyImageStyles(parsedData.image);
+          this.applyImportedTooltips(parsedData.tooltips);
+
+          // Chiudi resize panel
+          this.closeEditorUI();
+
+          // Salva localStorage SOLO se tutto OK
+          saveTooltipsToStorage();
+
+          showToast(
+            `${parsedData.tooltips.length} tooltip importati con successo`,
+            "success"
+          );
+        } catch (error) {
+          // ROLLBACK ATOMICO: Ripristina tutto come se import non fosse mai accaduto
+          this.restoreStateBackup(stateBackup);
+          saveTooltipsToStorage();
+
+          showToast(`Errore importazione: ${error.message}`, "error");
+        }
+      };
+
+      reader.readAsText(file);
+    });
+
+    fileInput.click();
+  },
+
+  // ============================================
+  // CSV EXPORT/IMPORT
+  // ============================================
+
+  exportTooltipsCSV() {
+    const tooltips = StateManager.get("tooltips");
+
+    if (tooltips.length === 0) {
+      showToast("Nessun tooltip da esportare", "warning");
+      return;
+    }
+
+    // Formatta tooltip (arrotonda x,y, rigenera ID)
+    const formattedTooltips = this.formatTooltipsForExport(tooltips);
+
+    // FASE 4: Crea file CSV
+    const fileContent = this.createExportFile("csv", formattedTooltips, null);
+
+    // FASE 4: Scarica
+    this.downloadFile(fileContent, "tooltips.csv", "text/csv");
+
+    showToast(
+      `${formattedTooltips.length} tooltip esportati in tooltips.csv`,
+      "success"
+    );
+  },
+
+  importTooltipsCSV() {
+    const fileInput = document.createElement("input");
+    fileInput.type = "file";
+    fileInput.accept = ".csv";
+
+    fileInput.addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        // BACKUP: Salva stato attuale PRIMA di qualunque modifica
+        const stateBackup = this.createStateBackup();
+
+        try {
+          // PARSE CSV
+          const csvText = event.target.result;
+          const parsedData = parseCSVTooltips(csvText);
+
+          // Apply: Tooltip soltanto (CSV non ha image data)
+          // applyImportedTooltips() contiene SVUOTA STATE
+          this.applyImportedTooltips(parsedData.tooltips);
+
+          // Chiudi resize panel
+          this.closeEditorUI();
+
+          // Salva localStorage SOLO se tutto OK
+          saveTooltipsToStorage();
+
+          showToast(
+            `${parsedData.tooltips.length} tooltip importati con successo`,
+            "success"
+          );
+        } catch (error) {
+          // ROLLBACK ATOMICO: Ripristina tutto come se import non fosse mai accaduto
+          this.restoreStateBackup(stateBackup);
+          saveTooltipsToStorage();
+
+          showToast(`Errore importazione: ${error.message}`, "error");
+        }
+      };
+
+      reader.readAsText(file);
+    });
+
+    fileInput.click();
+  },
+
+  // ============================================
+  // CLEAR ALL
+  // ============================================
+
+  clearAll() {
+    if (!this.clearAllState.isWaitingForConfirmation) {
+      this.clearAllState.isWaitingForConfirmation = true;
+      showToast("Clicca di nuovo entro 2 secondi per confermare", "warning");
+
+      this.clearAllState.timeoutId = setTimeout(() => {
+        this.clearAllState.isWaitingForConfirmation = false;
+        showToast("Azione annullata", "info");
+      }, 2000);
+    } else {
+      if (this.clearAllState.timeoutId) {
+        clearTimeout(this.clearAllState.timeoutId);
+        this.clearAllState.timeoutId = null;
+      }
+
+      this.clearAllState.isWaitingForConfirmation = false;
+
+      const overlay = getOverlay();
+
+      // Rimuovi tutti i tooltip dal DOM
+      if (overlay) overlay.innerHTML = "";
+
+      // SVUOTA STATE - Pattern coerente con applyImportedTooltips
+      StateManager.set("tooltips", []);
+      StateManager.set("ui.tooltipIdCounter", 0);
+      saveTooltipsToStorage();
+
+      showToast("Tutti i tooltip sono stati eliminati", "success");
+    }
+  },
+};
+
+
+====
+js/toast.js
+----
+// ============================================
+// TOAST NOTIFICATIONS
+// ============================================
+
+const TOAST_DURATION = 3000; // 3 secondi per tutti i toast
+
+function createToastContainer() {
+  if (!document.getElementById("toast-container")) {
+    const container = document.createElement("div");
+    container.id = "toast-container";
+    container.className = "toast-container";
+    document.body.appendChild(container);
+  }
+}
+
+function showToast(message, type = "info") {
+  createToastContainer();
+
+  const container = document.getElementById("toast-container");
+  const toast = document.createElement("div");
+
+  const icons = {
+    success: "✔",
+    error: "✕",
+    info: "ℹ",
+    warning: "⚠",
+  };
+
+  toast.className = `toast toast-${type}`;
+  toast.innerHTML = `
+    <span class="toast-icon">${icons[type]}</span>
+    <span class="toast-message">${message}</span>
+    <button class="toast-close" onclick="this.parentElement.remove()">✕</button>
+  `;
+
+  container.appendChild(toast);
+
+  // Auto-remove dopo TOAST_DURATION
+  setTimeout(() => {
+    toast.classList.add("toast-exit");
+    setTimeout(() => {
+      toast.remove();
+    }, 300);
+  }, TOAST_DURATION);
+}
+
+
+====
+js/tooltip.js
+----
+// ============================================
+// TOOLTIP MODULE
+// ============================================
+
+const Tooltip = {
+  hoverTimeoutId: null,
+  activeHoverId: null,
+  dragHandler: null,
+  stopDragHandler: null,
+
+  add() {
+    const tooltipIdCounter = StateManager.get("ui.tooltipIdCounter");
+    const newId = tooltipIdCounter + 1;
+    StateManager.set("ui.tooltipIdCounter", newId);
+
+    const img = getImageElement();
+    const imgRect = img.getBoundingClientRect();
+
+    // Center calcolato in base all'immagine nel DOM
+    const centerViewportX = imgRect.left + imgRect.width / 2;
+    const centerViewportY = imgRect.top + imgRect.height / 2;
+
+    const x = centerViewportX + window.scrollX;
+    const y = centerViewportY + window.scrollY;
+
+    let circleLetter = document.getElementById("circleLetter").value;
+    if (circleLetter.length > 0) {
+      circleLetter = circleLetter.substring(0, 1);
+    }
+    document.getElementById("circleLetter").value = circleLetter;
+
+    const circleColor = document.getElementById("circleColor").value;
+
+    const tooltipData = {
+      id: newId,
+      x: x,
+      y: y,
+      text: "tooltip",
+      color: circleColor,
+      letter: circleLetter,
+    };
+
+    const tooltips = StateManager.get("tooltips");
+    StateManager.set("tooltips", [...tooltips, tooltipData]);
+
+    this.render(tooltipData);
+    saveTooltipsToStorage();
+  },
+
+  getTextContent(element) {
+    let text = "";
+    for (let node of element.childNodes) {
+      if (node.nodeType === Node.TEXT_NODE) {
+        text += node.textContent;
+      } else if (node.nodeType === Node.ELEMENT_NODE && node.tagName === "BR") {
+        text += "\n";
+      }
+    }
+    return text;
+  },
+
+  cancelHideDelay() {
+    if (this.hoverTimeoutId) {
+      clearTimeout(this.hoverTimeoutId);
+      this.hoverTimeoutId = null;
+    }
+  },
+
+  showWithDelay(id) {
+    if (this.activeHoverId !== null && this.activeHoverId !== id) {
+      // this.hide(this.activeHoverId);
+      const text1 = document.getElementById(`text-${this.activeHoverId}`);
+      if (text1) {
+        text1.classList.remove("tooltip-visible");
+        text1.blur();
+      }
+    }
+
+    this.cancelHideDelay();
+    this.activeHoverId = id;
+    
+    const text = document.getElementById(`text-${id}`);
+    if (text) {
+      text.classList.add("tooltip-visible");
+      setTimeout(() => {
+        this.updateVisual(id);
+      }, 0);
+    }
+  },
+
+  render(data) {
+    const validatedCoords = validateCoordinates(data.x, data.y);
+    data.x = validatedCoords.x;
+    data.y = validatedCoords.y;
+
+    const point = document.createElement("div");
+    point.className = "tooltip-point-overlay";
+    point.id = `point-${data.id}`;
+    point.style.background = data.color;
+    point.textContent = data.letter;
+
+    const text = document.createElement("div");
+    text.className = "tooltip-text-overlay";
+    text.id = `text-${data.id}`;
+    text.contentEditable = true;
+
+    // this.setTextContent(text, data.text);
+    text.innerHTML = "";
+    const lines = data.text.split("\n");
+
+    lines.forEach((line, index) => {
+      if (index > 0) text.appendChild(document.createElement("br"));
+      if (line) text.appendChild(document.createTextNode(line));
+    });
+
+    const overlay = getOverlay();
+    overlay.appendChild(point);
+    overlay.appendChild(text);
+
+    this.updateVisual(data.id);
+
+    point.addEventListener("mousedown", (e) => this.startDrag(e, data.id));
+    point.addEventListener("mouseenter", () => this.showWithDelay(data.id));
+    point.addEventListener("mouseleave", () => this.hideWithDelay(data.id));
+
+    text.addEventListener("click", (e) => e.stopPropagation());
+    text.addEventListener("mouseenter", () => this.cancelHideDelay());
+    text.addEventListener("mouseleave", () => this.hideWithDelay(data.id));
+    
+    text.addEventListener("blur", () => {
+      const tooltips = StateManager.get("tooltips");
+      const tooltip = tooltips.find((t) => t.id === data.id);
+      if (tooltip) {
+        tooltip.text = this.getTextContent(text) || "tooltip";
+        saveTooltipsToStorage();
+      }
+      this.updateVisual(data.id);
+    });
+
+    text.addEventListener("keydown", (e) => {
+      if (!text.classList.contains("tooltip-visible")) {
+        e.preventDefault();
+        return;
+      }
+
+      if (e.key === "Enter") {
+        e.preventDefault();
+        const selection = window.getSelection();
+        const range = selection.getRangeAt(0);
+        const br = document.createElement("br");
+        range.insertNode(br);
+        range.setStartAfter(br);
+        range.collapse(true);
+        selection.removeAllRanges();
+        selection.addRange(range);
+
+        const tooltips = StateManager.get("tooltips");
+        const tooltip = tooltips.find((t) => t.id === data.id);
+        if (tooltip) {
+          tooltip.text = this.getTextContent(text) || "tooltip";
+          saveTooltipsToStorage();
+        }
+
+        setTimeout(() => {
+          this.updateVisual(data.id);
+        }, 0);
+      }
+    });
+    
+    text.addEventListener("input", () => {
+      if (!text.classList.contains("tooltip-visible")) {
+        text.blur();
+        return;
+      }
+      
+      setTimeout(() => {
+        this.updateVisual(data.id);
+      }, 0);
+    });
+  },
+
+  hideWithDelay(id) {
+    this.hoverTimeoutId = setTimeout(() => {
+      if (this.activeHoverId === id) {
+        this.activeHoverId = null;
+        const text = document.getElementById(`text-${id}`);
+        if (text) {
+          text.classList.remove("tooltip-visible");
+          text.blur();
+        }
+      }
+    }, 200);
+  },
+
+  /*
+  show(id) {
+    const text = document.getElementById(`text-${id}`);
+    if (text) {
+      text.classList.add("tooltip-visible");
+    }
+  },
+  */
+
+  /*
+  hide(id) {
+    const text = document.getElementById(`text-${id}`);
+    if (text) {
+      text.classList.remove("tooltip-visible");
+      text.blur();
+    }
+  },
+  */
+
+  startDrag(e, id) {
+    const tooltips = StateManager.get("tooltips");
+    const tooltip = tooltips.find((t) => t.id === id);
+    if (!tooltip) return;
+
+    StateManager.set("ui.draggingTooltip", id);
+
+    const point = document.getElementById(`point-${id}`);
+    const text = document.getElementById(`text-${id}`);
+    if (point) point.classList.add("tooltip-dragging");
+    if (text) text.classList.add("tooltip-dragging");
+
+    const mousePageX = e.clientX + window.scrollX;
+    const mousePageY = e.clientY + window.scrollY;
+
+    StateManager.set("ui.offsetX", mousePageX - tooltip.x);
+    StateManager.set("ui.offsetY", mousePageY - tooltip.y);
+
+    const textElement = document.getElementById(`text-${id}`);
+    if (textElement) {
+      textElement.focus();
+      const range = document.createRange();
+      const sel = window.getSelection();
+      range.selectNodeContents(textElement);
+      range.collapse(false);
+      sel.removeAllRanges();
+      sel.addRange(range);
+    }
+
+    document.addEventListener("mousemove", this.dragHandler);
+    document.addEventListener("mouseup", this.stopDragHandler);
+
+    e.preventDefault();
+  },
+
+  drag(e) {
+    const draggingTooltip = StateManager.get("ui.draggingTooltip");
+    if (!draggingTooltip) return;
+
+    const tooltips = StateManager.get("tooltips");
+    const tooltip = tooltips.find((t) => t.id === draggingTooltip);
+    if (!tooltip) return;
+
+    const mousePageX = e.clientX + window.scrollX;
+    const mousePageY = e.clientY + window.scrollY;
+
+    const offsetX = StateManager.get("ui.offsetX");
+    const offsetY = StateManager.get("ui.offsetY");
+
+    tooltip.x = mousePageX - offsetX;
+    tooltip.y = mousePageY - offsetY;
+
+    // ⚠️ BINDING: Usa Tooltip.updateVisual() se il binding di 'this' cambia
+    // (es. se dragHandler non è più bound con .bind(Tooltip) in app.js)
+    this.updateVisual(draggingTooltip);
+
+    const deleteZone = document.getElementById("deleteZone");
+    const deleteRect = deleteZone.getBoundingClientRect();
+    const deleteX = deleteRect.left + deleteRect.width / 2;
+    const deleteY = deleteRect.top + deleteRect.height / 2;
+
+    const distance = Math.sqrt(
+      Math.pow(e.clientX - deleteX, 2) + Math.pow(e.clientY - deleteY, 2)
+    );
+
+    if (distance < 150) {
+      deleteZone.classList.add("tooltip-delete-active");
+    } else {
+      deleteZone.classList.remove("tooltip-delete-active");
+    }
+  },
+
+  stopDrag(e) {
+    const draggingTooltip = StateManager.get("ui.draggingTooltip");
+    if (!draggingTooltip) return;
+
+    const tooltips = StateManager.get("tooltips");
+    const tooltip = tooltips.find((t) => t.id === draggingTooltip);
+    if (!tooltip) {
+      StateManager.set("ui.draggingTooltip", null);
+      return;
+    }
+
+    const pointBaseZ = 2000;
+    const textboxBaseZ = 3000;
+
+    tooltips.forEach((t) => {
+      const pointEl = document.getElementById(`point-${t.id}`);
+      const textEl = document.getElementById(`text-${t.id}`);
+
+      if (t.id === draggingTooltip) {
+        if (pointEl) {
+          pointEl.style.zIndex = pointBaseZ;
+          pointEl.classList.remove("tooltip-dragging");
+        }
+        if (textEl) {
+          textEl.style.zIndex = textboxBaseZ + tooltips.length;
+          textEl.classList.remove("tooltip-dragging");
+        }
+      } else {
+        if (pointEl) {
+          pointEl.style.zIndex = pointBaseZ + 10;
+        }
+        if (textEl) {
+          textEl.style.zIndex = textboxBaseZ + (t.id % tooltips.length);
+        }
+      }
+    });
+
+    const deleteZone = document.getElementById("deleteZone");
+    const deleteRect = deleteZone.getBoundingClientRect();
+    const deleteX = deleteRect.left + deleteRect.width / 2;
+    const deleteY = deleteRect.top + deleteRect.height / 2;
+
+    const distance = Math.sqrt(
+      Math.pow(e.clientX - deleteX, 2) + Math.pow(e.clientY - deleteY, 2)
+    );
+
+    if (distance < 150) {
+      // ⚠️ BINDING: Usa Tooltip.delete() se il binding di 'this' cambia
+      // (es. se stopDragHandler non è più bound con .bind(Tooltip) in app.js)
+      this.delete(draggingTooltip);
+    } else {
+      saveTooltipsToStorage();
+    }
+
+    deleteZone.classList.remove("tooltip-delete-active");
+    document.removeEventListener("mousemove", this.dragHandler);
+    document.removeEventListener("mouseup", this.stopDragHandler);
+    StateManager.set("ui.draggingTooltip", null);
+  },
+
+  delete(id) {
+    const tooltips = StateManager.get("tooltips");
+    StateManager.set(
+      "tooltips",
+      tooltips.filter((t) => t.id !== id)
+    );
+    document.getElementById(`point-${id}`)?.remove();
+    document.getElementById(`text-${id}`)?.remove();
+    saveTooltipsToStorage();
+  },
+
+  updateVisual(id) {
+    const tooltips = StateManager.get("tooltips");
+    const tooltip = tooltips.find((t) => t.id === id);
+    if (!tooltip) return;
+
+    const point = document.getElementById(`point-${id}`);
+    const text = document.getElementById(`text-${id}`);
+
+    const viewportX = tooltip.x - window.scrollX;
+    const viewportY = tooltip.y - window.scrollY;
+
+    if (point) {
+      point.style.left = viewportX + "px";
+      point.style.top = viewportY + "px";
+      point.style.transform = "translate(-50%, -50%)";
+    }
+
+    if (text) {
+      const textTopPosition = viewportY - text.offsetHeight - 8;
+
+      text.style.left = viewportX + "px";
+      text.style.top = textTopPosition + "px";
+      text.style.transform = "translateX(-50%)";
+    }
+  },
+};
+
+window.addEventListener("scroll", () => {
+  const tooltips = StateManager.get("tooltips");
+  tooltips.forEach((tooltip) => {
+    Tooltip.updateVisual(tooltip.id);
+  });
+});
+
+
+====
+js/validators.js
+----
+// ============================================
+// VALIDATORS MODULE
+// ============================================
+
+/**
+ * Normalizza un singolo valore di campo
+ * Per coordinate (x, y, width, height): THROW se stringa invalida (bloccante)
+ * Ordine: trim → controlla "auto" → parseFloat (se numero) → validazione
+ *
+ * @param {string} fieldName - Nome campo (x, y, width, height, color, letter, text)
+ * @param {*} value - Valore grezzo
+ * @param {number} lineNumber - Numero riga per messaggi errore (solo per x,y - opzionale)
+ * @returns {*} Valore normalizzato
+ * @throws {Error} Se coordinata invalida (bloccante)
+ */
+function normalizeFieldValue(fieldName, value, lineNumber = null) {
+  // CAMPI NUMERICI x, y, width, height: trim → parseFloat (VALIDAZIONE BLOCCANTE)
+  if (["x", "y", "width", "height"].includes(fieldName)) {
+    // Prepara valore
+    let trimmed = null;
+    let num = null;
+    // Caso 1 + 2: stringa o numero
+    if (typeof value === "string") {
+      trimmed = value.trim();
+      // Caso: stringa vuota o "auto" → null
+      if (trimmed === "" || trimmed.toLowerCase() === "auto")
+        return null;
+      num = parseFloat(trimmed);
+    } else if (typeof value === "number") {
+      num = value;
+    } else if (value === null || value === undefined) {
+      return null;
+    } else {
+      // Tipo inaspettato
+      const msg = lineNumber
+        ? `Riga ${lineNumber}: campo ${fieldName} ha tipo ${typeof value}`
+        : `Campo ${fieldName} ha tipo ${typeof value}`;
+      throw new Error(msg);
+    }
+    // Valida numero
+    if (isNaN(num)) {
+      const msg = lineNumber
+        ? `Riga ${lineNumber}: campo ${fieldName} non convertibile a numero`
+        : `Campo ${fieldName} non convertibile a numero`;
+      throw new Error(msg);
+    }
+    // Numeri ≤ 0 → null
+    return num > 0 ? Math.round(num) : null;
+  }
+
+  // campo colore: stringa o null
+  if (fieldName === "color") {
+    if (typeof value === "string") {
+      const trimmed = value.trim();
+      return trimmed || null;
+    }
+    return null;
+  }
+
+  // Campo lettera: max 1 carattere, no trim
+  if (fieldName === "letter") {
+    if (typeof value === "string") {
+      return value.substring(0, 1);
+    }
+    if (typeof value === "number") {
+      return String(value).substring(0, 1);
+    }
+    return "";
+  }
+
+  // Campo testo: PRESERVA spazi (NO trim), ma non svg/html
+  if (fieldName === "text") {
+    if (typeof value === "string") {
+      return value;
+    }
+    if (typeof value === "number") {
+      return String(value);
+    }
+    return "";
+  }
+
+  // Campi extra (note, commenti): no trim e preserva
+  return value;
+}
+
+/**
+ * Normalizza un tooltip completo con validazione
+ * @param {object} tooltipData - Dati tooltip grezzi
+ * @param {number} autoId - ID automatico (opzionale)
+ * @param {number} lineNumber - Numero riga per messaggi errore (opzionale)
+ * @returns {object} Tooltip normalizzato e validato
+ * @throws {Error} Se coordinate invalide (bloccante)
+ */
+function normalizeTooltipData(tooltipData, autoId = null, lineNumber = null) {
+  tooltipData = tooltipData && typeof tooltipData === "object" ? tooltipData : {};
+  tooltipData.x ??= undefined;
+  tooltipData.y ??= undefined;
+  tooltipData.color ??= undefined;
+  tooltipData.letter ??= undefined;
+  tooltipData.text ??= undefined;
+
+  const normalized = {};
+  // Gestione ID (separata, non normalizza)
+  normalized.id = autoId !== null ? autoId : tooltipData.id || 0;
+
+  // Loop su TUTTI i campi (escluso id)
+  for (const key in tooltipData) {
+    if (key === "id") continue;
+    // Passa OGNI campo a normalizeFieldValue()
+    // Il nome della key diventa il fieldName per il validatore
+    normalized[key] = normalizeFieldValue(key, tooltipData[key], lineNumber);
+  }
+
+  Object.assign(normalized, validateCoordinates(normalized.x, normalized.y));
+
+  if (!isValidColor(normalized.color)) normalized.color = "#ff0000";
+
+  return normalized;
+}
+
+/**
+ * Normalizza dati immagine con validazione
+ * @param {object} imageData - Dati immagine grezzi
+ * @returns {object} Dati immagine normalizzati
+ * @throws {Error} Se width/height invalide (bloccante)
+ */
+function normalizeImageData(imageData) {
+  if (!imageData || typeof imageData !== "object") {
+    imageData = {};
+  }
+
+  let width = normalizeFieldValue("width", imageData.width);
+  let height = normalizeFieldValue("height", imageData.height);
+  const validated = validateImageDimensions(width, height);
+
+  return {
+    width: validated.width,
+    height: validated.height,
+    inverted: Boolean(imageData.inverted) || false,
+  };
+}
+
+/** Crea un tooltip con tutti i default */
+function createDefaultTooltip(id) {
+  const { centerX, centerY } = getImageCenters();
+  return {
+    id: id || 1,
+    x: centerX,
+    y: centerY,
+    text: "",
+    color: "#ff0000",
+    letter: "",
+  };
+}
+
+// ============================================
+// PARSING FORMATO
+// ============================================
+
+/**
+ * Converte una riga CSV (array di stringhe) → oggetto tooltip
+ * @param {string[]} row - Array di stringhe della riga CSV
+ * @param {string[]} headers - Array di header names
+ * @param {number} lineNumber - Numero riga per errori (1-based)
+ * @returns {object} Oggetto grezzo con dati tooltip
+ * @throws {Error} Se row ha più elementi che headers (errore bloccante)
+ */
+function rowToTooltipObject(row, headers, lineNumber) {
+  // VALIDAZIONE BLOCCANTE: troppe colonne in questa riga
+  if (row.length > headers.length) {
+    throw new Error(
+      `Riga ${lineNumber}: ${row.length} dati > ${headers.length} headers`
+    );
+  }
+
+  const tooltipData = {};
+  for (let j = 0; j < headers.length; j++) {
+    const headerName = headers[j];
+    // Skip header "id" (rigenerato ad ogni import)
+    if (headerName === "id") continue;
+    // Se colonna non esiste nella riga, usa stringa vuota
+    const value = row[j] !== undefined ? row[j] : "";
+    tooltipData[headerName] = value;
+  }
+
+  return tooltipData;
+}
+
+/**
+ * Parsa JSON e estrae tooltip con normalizzazione
+ * @param {string} jsonText - Contenuto JSON
+ * @returns {object} {tooltips: [], image: {}}
+ * @throws {Error} Se JSON non valido o coordinate invalide (bloccante)
+ */
+function parseJSONTooltips(jsonText) {
+  let importedData;
+
+  // VALIDAZIONE BLOCCANTE: JSON parse
+  try {
+    importedData = JSON.parse(jsonText);
+  } catch (parseError) {
+    throw new Error("JSON non valido: " + parseError.message);
+  }
+
+  const importedTooltips = importedData.tooltips;
+  const importedImage = importedData.image;
+
+  // VALIDAZIONE BLOCCANTE: tooltips è array
+  if (!Array.isArray(importedTooltips)) {
+    throw new Error("Campo 'tooltips' non è un array");
+  }
+
+  // PARSING + NORMALIZZAZIONE UNIFICATA
+  const normalizedTooltips = importedTooltips.map((tooltipData, index) => {
+    const lineNumber = index + 6; // Numero riga approssimativo nel file JSON
+    return normalizeTooltipData(tooltipData, index + 1, lineNumber);
+  });
+
+  const normalizedImage = importedImage
+    ? normalizeImageData(importedImage)
+    : null;
+
+  return {
+    tooltips: normalizedTooltips,
+    image: normalizedImage,
+  };
+}
+
+/**
+ * Parsa CSV e estrae tooltip con normalizzazione
+ * Righe vuote → tooltip default (non skip)
+ * Multi-line in text → gestito da parseCSV() con quoting
+ *
+ * @param {string} csvText - Contenuto CSV
+ * @returns {object} {tooltips: []}
+ * @throws {Error} Se CSV invalido, header invalido, o coordinate invalide (bloccante)
+ */
+function parseCSVTooltips(csvText) {
+  const rows = parseCSV(csvText);
+
+  if (rows.length === 0) {
+    throw new Error("CSV vuoto");
+  }
+
+  let headers = rows[0];
+
+  if (headers.length === 0) {
+    throw new Error("CSV non ha headers");
+  }
+  // VALIDAZIONE BLOCCANTE: header validi (non vuoti, non duplicati)
+  // nessun header vuoto
+  for (let i = 0; i < headers.length; i++) {
+    if (!headers[i] || headers[i].trim() === "") {
+      throw new Error(
+        `Header riga 1, colonna ${i + 1}: header non può essere vuoto`
+      );
+    }
+  }
+
+  // nessun header duplicato
+  const seenHeaders = new Set();
+  for (let i = 0; i < headers.length; i++) {
+    const headerName = headers[i];
+    if (seenHeaders.has(headerName)) {
+      throw new Error(
+        `Header riga 1: header "${headerName}" è duplicato (colonna ${i + 1})`
+      );
+    }
+    seenHeaders.add(headerName);
+  }
+
+  // PARSING + NORMALIZZAZIONE UNIFICATA
+  const normalizedTooltips = [];
+
+  for (let i = 1; i < rows.length; i++) {
+    const lineNumber = i + 1; // Numero riga effettivo
+    let row = rows[i];
+    // Trim colonne vuote finali PRIMA di check
+    while (
+      row.length > 0 &&
+      (row[row.length - 1] === "" || row[row.length - 1] === undefined)
+    )
+      row.pop();
+
+    // Controllo riga vuota → crea tooltip default
+    const isEmptyRow = row.every(
+      (field) => field === "" || field === undefined
+    );
+
+    if (isEmptyRow) {
+      // Riga vuota → crea default tooltip con centro immagine
+      // id = numero riga escluso headers
+      normalizedTooltips.push(createDefaultTooltip(i));
+      continue;
+    }
+
+    const tooltipData = rowToTooltipObject(row, headers, lineNumber);
+
+    // Normalizzazione con validazione coordinate bloccante
+    const normalized = normalizeTooltipData(
+      tooltipData,
+      i, // id = numero riga escluso headers, rigenerato ad ogni import/export
+      lineNumber
+    );
+    normalizedTooltips.push(normalized);
+  }
+
+  return {
+    tooltips: normalizedTooltips,
+  };
+}
+
+// ============================================
+// VALIDATORI CORE
+// ============================================
+
+/**
+ * Valida se un colore hex è valido (case-insensitive)
+ * @param {string} color - Colore hex (#RRGGBB o #RGB)
+ * @returns {boolean} True se valido
+ */
+function isValidColor(color) {
+  if (!color || typeof color !== "string") return false;
+  // Normalizza a minuscolo per validazione case-insensitive
+  const hexRegex = /^#(?:[0-9a-fA-F]{3}){1,2}$/;
+  return hexRegex.test(color.toLowerCase());
+}
+
+/**
+ * Valida coordinate con fallback a center image
+ * Se x o y ≤ 0 o non sono numeri → fallback a center image
+ */
+function validateCoordinates(x, y) {
+  const { centerX, centerY } = getImageCenters();
+
+  const validX = typeof x === "number" && x > 0 ? x : centerX;
+  const validY = typeof y === "number" && y > 0 ? y : centerY;
+
+  return { x: validX, y: validY };
+}
+
+/**
+ * Valida tooltip completo (legacy, usa normalizeTooltipData)
+ * @deprecated
+ */
+function validateTooltip(tooltipData, autoId = null) {
+  return normalizeTooltipData(tooltipData, autoId);
+}
+
+function cleanTooltip(tooltip) {
+  const cleaned = {};
+  const requiredFields = getRequiredFields();
+
+  for (const key in tooltip) {
+    const value = tooltip[key];
+
+    if (requiredFields.includes(key)) {
+      cleaned[key] = value;
+    } else {
+      if (value !== "" && value !== null && value !== undefined) {
+        cleaned[key] = value;
+      }
+    }
+  }
+  return cleaned;
+}
+
+// IMMAGINE
+
+function validateImageDimensions(width, height) {
+  const img = getImageElement();
+
+  const currentWidth = img.offsetWidth;
+  const currentHeight = img.offsetHeight;
+  const aspectRatio = currentWidth / currentHeight;
+
+  const validWidth = typeof width === "number" && width > 0 ? width : null;
+  const validHeight = typeof height === "number" && height > 0 ? height : null;
+
+  // Caso 1: entrambi validi → usali
+  if (validWidth && validHeight) {
+    return { width: validWidth, height: validHeight };
+  }
+
+  // Caso 2: solo width valido → calcola height dal ratio
+  if (validWidth && !validHeight) {
+    const calculatedHeight = Math.round(validWidth / aspectRatio);
+    return { width: validWidth, height: calculatedHeight };
+  }
+
+  // Caso 3: solo height valido → calcola width dal ratio
+  if (!validWidth && validHeight) {
+    const calculatedWidth = Math.round(validHeight * aspectRatio);
+    return { width: calculatedWidth, height: validHeight };
+  }
+
+  // Caso 4: niente valido → ritorna dimensioni originali
+  return { width: currentWidth, height: currentHeight };
+}
+
+// ============================================
+// CSV UTILITIES
+// ============================================
+
+function escapeCSV(field) {
+  if (field === null || field === undefined) {
+    return "";
+  }
+  const str = String(field);
+  if (str.includes(",") || str.includes("\n") || str.includes('"')) {
+    return '"' + str.replace(/"/g, '""') + '"';
+  }
+  return str;
+}
+
+function parseCSV(csvText) {
+  const lines = [];
+  let currentLine = "";
+  let insideQuotes = false;
+
+  for (let i = 0; i < csvText.length; i++) {
+    const char = csvText[i];
+    const nextChar = csvText[i + 1];
+
+    if (char === '"') {
+      if (insideQuotes && nextChar === '"') {
+        currentLine += '"';
+        i++;
+      } else {
+        insideQuotes = !insideQuotes;
+      }
+    } else if (char === "\n" && !insideQuotes) {
+      if (currentLine.trim() || currentLine.length > 0) {
+        lines.push(currentLine);
+      }
+      currentLine = "";
+    } else {
+      currentLine += char;
+    }
+  }
+
+  if (currentLine.trim() || currentLine.length > 0) {
+    lines.push(currentLine);
+  }
+
+  const rows = lines.map((line) => {
+    const fields = [];
+    let currentField = "";
+    let insideQuotes = false;
+
+    for (let i = 0; i < line.length; i++) {
+      const char = line[i];
+      const nextChar = line[i + 1];
+
+      if (char === '"') {
+        if (insideQuotes && nextChar === '"') {
+          currentField += '"';
+          i++;
+        } else {
+          insideQuotes = !insideQuotes;
+        }
+      } else if (char === "," && !insideQuotes) {
+        fields.push(currentField.trim());
+        currentField = "";
+      } else {
+        currentField += char;
+      }
+    }
+
+    fields.push(currentField.trim());
+    return fields;
+  });
+
+  return rows;
+}
+
+function getCSVHeadersFromData(tooltips) {
+  if (tooltips.length === 0) {
+    return [];
+  }
+
+  const firstTooltip = tooltips[0];
+  const headers = [];
+
+  for (const key in firstTooltip) {
+    if (key !== "id") {
+      headers.push(key);
+    }
+  }
+
+  tooltips.forEach((tooltip, index) => {
+    if (index === 0) return;
+
+    for (const key in tooltip) {
+      if (key !== "id" && !headers.includes(key)) {
+        headers.push(key);
+      }
+    }
+  });
+
+  return headers;
+}
+
+function tooltipsToCSV(tooltips) {
+  const headers = getCSVHeadersFromData(tooltips);
+
+  if (headers.length === 0) {
+    return "";
+  }
+
+  const lines = [headers.join(",")];
+
+  tooltips.forEach((tooltip) => {
+    const row = headers.map((header) => {
+      let value = tooltip[header];
+
+      if ((header === "x" || header === "y") && typeof value === "number") {
+        return Math.round(value);
+      }
+
+      if (typeof value === "string") {
+        value = JSON.parse('"' + value + '"');
+      }
+
+      return escapeCSV(value);
+    });
+    lines.push(row.join(","));
+  });
+
+  return lines.join("\n");
+}
+
+
+====
+styles/base.css
+----
+/* ============================================
+   RESET & NORMALIZATION
+   ============================================ */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: var(--space-xl);
+  background: var(--color-bg);
+  min-height: 100vh;
+  font-family: var(--font-family);
+  color: var(--color-text);
+}
+
+/* ============================================
+   TYPOGRAPHY
+   ============================================ */
+h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+  font-weight: var(--font-weight-semibold);
+}
+
+p {
+  margin: 0;
+}
+
+a {
+  color: var(--color-secondary);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+a:hover {
+  color: var(--color-secondary-dark);
+}
+
+code {
+  font-family: "Courier New", monospace;
+}
+
+/* ============================================
+   FORM ELEMENTS (BASE)
+   ============================================ */
+input[type="text"],
+input[type="number"],
+input[type="color"],
+select,
+textarea {
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  transition: border-color var(--transition-fast);
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+input[type="color"]:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+button {
+  padding: 11px 16px;
+  font-size: var(--font-size-base);
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-weight: var(--font-weight-semibold);
+  transition: all var(--transition-normal);
+  white-space: nowrap;
+  text-align: center;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ============================================
+   UTILITY
+   ============================================ */
+.hidden {
+  display: none;
+}
+
+
+====
+styles/components.css
+----
+/* ============================================
+   BUTTONS
+   ============================================ */
+.btn-primary {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+  color: white;
+  width: 100%;
+  padding: 13px 16px;
+  font-size: var(--font-size-md);
+  box-shadow: 0 4px 12px rgba(51, 51, 51, 0.2);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(51, 51, 51, 0.3);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-secondary {
+  background: #f0f0f0;
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  width: 100%;
+}
+
+.btn-secondary:hover {
+  background: #e8e8e8;
+  border-color: #999;
+}
+
+.btn-secondary.editor-active {
+  background: linear-gradient(135deg, var(--color-success) 0%, var(--color-success-dark) 100%);
+  color: white;
+  border-color: var(--color-success);
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+}
+
+/* ============================================
+   FORM CONTROLS
+   ============================================ */
+.control-group {
+  display: flex;
+  gap: var(--space-md);
+  align-items: center;
+  background: var(--color-bg-light);
+  padding: var(--space-md);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border-light);
+}
+
+.control-group label {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+  min-width: 70px;
+}
+
+.control-group input[type="color"] {
+  width: 50px;
+  height: 40px;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: transform var(--transition-fast);
+}
+
+.control-group input[type="color"]:hover {
+  transform: scale(1.05);
+}
+
+.control-group input[type="text"] {
+  width: 60px;
+  padding: var(--space-sm) var(--space-md);
+  font-size: var(--font-size-base);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  text-align: center;
+  font-weight: var(--font-weight-semibold);
+  transition: border-color var(--transition-fast);
+}
+
+.control-group input[type="text"]:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-input-focus-lg);
+}
+
+
+====
+styles/editor.css
+----
+/* ============================================
+   EDITOR RESIZE PANEL
+   ============================================ */
+.editor-resize-panel {
+  background: var(--color-bg-light);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  animation: slideDown var(--transition-normal);
+}
+
+.editor-resize-panel.hidden {
+  display: none;
+}
+
+/* ============================================
+   RESIZE INPUTS
+   ============================================ */
+.editor-resize-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.editor-resize-input-group {
+  display: flex;
+  gap: var(--space-sm);
+  align-items: center;
+}
+
+.editor-resize-input-group label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+  min-width: 110px;
+  white-space: nowrap;
+}
+
+.editor-resize-input-group input {
+  width: 100%;
+  padding: var(--space-sm) var(--space-md);
+  font-size: var(--font-size-sm);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  transition: border-color var(--transition-fast);
+}
+
+.editor-resize-input-group input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-input-focus);
+}
+
+/* ============================================
+   EDITOR BUTTONS
+   ============================================ */
+.editor-btn-lock {
+  background: var(--color-secondary);
+  color: white;
+  width: 100%;
+  font-size: var(--font-size-sm);
+  padding: 10px 12px;
+  box-shadow: 0 2px 8px rgba(33, 150, 243, 0.2);
+}
+
+.editor-btn-lock:hover {
+  background: var(--color-secondary-dark);
+  box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+}
+
+.editor-btn-lock.editor-active {
+  background: linear-gradient(135deg, var(--color-warning) 0%, var(--color-warning-alt) 100%);
+  box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);
+}
+
+.editor-resize-actions {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.editor-btn-apply {
+  flex: 1;
+  background: var(--color-success);
+  color: white;
+  padding: 10px 12px;
+  font-size: var(--font-size-sm);
+  box-shadow: 0 2px 8px rgba(76, 175, 80, 0.2);
+}
+
+.editor-btn-apply:hover {
+  background: var(--color-success-dark);
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+}
+
+.editor-btn-reset {
+  flex: 1;
+  background: var(--color-warning);
+  color: white;
+  padding: 10px 12px;
+  font-size: var(--font-size-sm);
+  box-shadow: 0 2px 8px rgba(255, 152, 0, 0.2);
+}
+
+.editor-btn-reset:hover {
+  background: var(--color-warning-dark);
+  box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);
+}
+
+
+====
+styles/layout.css
+----
+/* ============================================
+   PAGE STRUCTURE
+   ============================================ */
+.page-wrapper {
+  position: relative;
+}
+
+.container {
+  position: relative;
+  display: inline-block;
+  margin-top: var(--space-xl);
+  margin-left: var(--space-xl);
+  box-shadow: var(--shadow-lg);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+img {
+  display: block;
+  width: 100%;
+  max-width: 880px;
+  transition: filter var(--transition-normal);
+}
+
+/* ============================================
+   CONTROLS LAYOUT
+   ============================================ */
+.controls-container {
+  margin-top: var(--space-3xl);
+  margin-left: var(--space-xl);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2xl);
+  max-width: 900px;
+}
+
+.control-section {
+  background: var(--color-bg-white);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  transition: box-shadow var(--transition-normal), 
+              transform var(--transition-normal);
+}
+
+.control-section:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.section-title {
+  margin: 0;
+  padding: var(--space-lg) var(--space-xl);
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+  color: white;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.section-content {
+  padding: var(--space-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+
+====
+styles/manager.css
+----
+/* ============================================
+   MANAGER BUTTONS
+   ============================================ */
+.btn-manager {
+  width: 100%;
+  padding: var(--space-md) var(--space-lg);
+  font-size: var(--font-size-md);
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-weight: var(--font-weight-semibold);
+  transition: all var(--transition-normal);
+  white-space: nowrap;
+  text-align: center;
+}
+
+.btn-manager-import {
+  background: linear-gradient(135deg, var(--color-secondary) 0%, var(--color-secondary-dark) 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(33, 150, 243, 0.2);
+}
+
+.btn-manager-import:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(33, 150, 243, 0.3);
+}
+
+.btn-manager-import:active {
+  transform: translateY(0);
+}
+
+.btn-manager-export {
+  background: linear-gradient(135deg, var(--color-success) 0%, var(--color-success-dark) 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2);
+}
+
+.btn-manager-export:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(76, 175, 80, 0.3);
+}
+
+.btn-manager-export:active {
+  transform: translateY(0);
+}
+
+.btn-manager-new {
+  background: linear-gradient(135deg, var(--color-warning) 0%, var(--color-warning-dark) 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(255, 152, 0, 0.2);
+}
+
+.btn-manager-new:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(255, 152, 0, 0.3);
+}
+
+.btn-manager-new:active {
+  transform: translateY(0);
+}
+
+/* ============================================
+   TOOLTIP WRAPPER
+   ============================================ */
+.tooltip-wrapper {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+.tooltip-text {
+  visibility: hidden;
+  background-color: var(--color-text);
+  color: #fff;
+  text-align: center;
+  border-radius: var(--radius-sm);
+  padding: var(--space-sm) var(--space-md);
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-size: var(--font-size-sm);
+  opacity: 0;
+  transition: opacity var(--transition-normal);
+  pointer-events: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.tooltip-text::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: var(--color-text) transparent transparent transparent;
+}
+
+.tooltip-wrapper:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* ============================================
+   TOAST NOTIFICATIONS
+   ============================================ */
+.toast-container {
+  position: fixed;
+  bottom: var(--space-xl);
+  right: var(--space-xl);
+  z-index: 9999;
+  pointer-events: none;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  background: var(--color-bg-white);
+  color: var(--color-text);
+  padding: 14px var(--space-xl);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-toast);
+  margin-bottom: var(--space-sm);
+  min-width: 300px;
+  pointer-events: auto;
+  animation: slideInToast var(--transition-normal);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+}
+
+.toast.toast-success {
+  border-left: 4px solid var(--color-success);
+}
+
+.toast.toast-success .toast-icon {
+  color: var(--color-success);
+  font-size: 18px;
+}
+
+.toast.toast-error {
+  border-left: 4px solid var(--color-error);
+}
+
+.toast.toast-error .toast-icon {
+  color: var(--color-error);
+  font-size: 18px;
+}
+
+.toast.toast-info {
+  border-left: 4px solid var(--color-secondary);
+}
+
+.toast.toast-info .toast-icon {
+  color: var(--color-secondary);
+  font-size: 18px;
+}
+
+.toast.toast-warning {
+  border-left: 4px solid var(--color-warning);
+}
+
+.toast.toast-warning .toast-icon {
+  color: var(--color-warning);
+  font-size: 18px;
+}
+
+.toast-icon {
+  flex-shrink: 0;
+  font-size: 18px;
+}
+
+.toast-message {
+  flex: 1;
+}
+
+.toast-close {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  color: var(--color-text-light);
+  cursor: pointer;
+  font-size: 16px;
+  padding: 0;
+  transition: color var(--transition-fast);
+}
+
+.toast-close:hover {
+  color: var(--color-text);
+}
+
+.toast.toast-exit {
+  animation: slideOutToast var(--transition-normal);
+}
+
+
+====
+styles/responsive.css
+----
+/* ============================================
+   TABLET & MOBILE BREAKPOINTS
+   ============================================ */
+
+/* Tablet: 768px and below */
+@media (max-width: 768px) {
+  /* Layout */
+  .controls-container {
+    grid-template-columns: 1fr;
+    margin-left: var(--space-sm);
+  }
+
+  .container {
+    margin-left: var(--space-sm);
+  }
+
+  /* Toast */
+  .toast-container {
+    bottom: var(--space-sm);
+    right: var(--space-sm);
+    left: var(--space-sm);
+  }
+
+  .toast {
+    min-width: auto;
+    width: 100%;
+  }
+
+  /* Tooltip text */
+  .tooltip-text {
+    white-space: normal;
+    width: 150px;
+    left: auto;
+    right: -20px;
+    transform: none;
+  }
+
+  .tooltip-text::after {
+    left: auto;
+    right: 10px;
+  }
+}
+
+/* Mobile: 600px and below */
+@media (max-width: 600px) {
+  body {
+    padding: var(--space-md);
+  }
+
+  .container {
+    margin-top: var(--space-lg);
+    margin-left: 0;
+  }
+
+  .controls-container {
+    margin-left: 0;
+    margin-top: var(--space-2xl);
+    gap: var(--space-xl);
+  }
+
+  img {
+    max-width: 100%;
+  }
+
+  /* Buttons */
+  button {
+    padding: 10px 12px;
+    font-size: var(--font-size-sm);
+  }
+
+  /* Editor panel */
+  .editor-resize-input-group {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .editor-resize-input-group label {
+    min-width: auto;
+  }
+
+  .editor-resize-input-group input {
+    width: 100%;
+  }
+
+  /* Toast */
+  .toast-container {
+    bottom: var(--space-sm);
+    right: var(--space-sm);
+    left: var(--space-sm);
+  }
+
+  .toast {
+    min-width: auto;
+    padding: 12px var(--space-lg);
+  }
+
+  .toast-icon {
+    display: none;
+  }
+}
+
+/* Small mobile: 400px and below */
+@media (max-width: 400px) {
+  body {
+    padding: var(--space-sm);
+  }
+
+  .control-section {
+    border-radius: var(--radius-md);
+  }
+
+  .section-title {
+    font-size: var(--font-size-base);
+    padding: var(--space-md) var(--space-lg);
+  }
+
+  .section-content {
+    padding: var(--space-lg);
+    gap: var(--space-md);
+  }
+
+  .control-group {
+    flex-wrap: wrap;
+  }
+
+  .control-group label {
+    min-width: 100%;
+    margin-bottom: var(--space-xs);
+  }
+
+  .toast {
+    min-width: auto;
+    font-size: var(--font-size-sm);
+    padding: 10px var(--space-md);
+  }
+
+  .toast-message {
+    font-size: var(--font-size-xs);
+  }
+}
+
+
+====
+styles/tooltip.css
+----
+/* ============================================
+   DELETE ZONE
+   ============================================ */
+.delete-zone {
+  position: relative;
+  width: 100%;
+  height: 100px;
+  background: linear-gradient(135deg, var(--color-danger) 0%, var(--color-danger-alt) 100%);
+  border: 3px dashed var(--color-border-dark);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: var(--font-weight-semibold);
+  text-align: center;
+  z-index: 5;
+  cursor: grab;
+  transition: all var(--transition-normal);
+  gap: var(--space-sm);
+}
+
+.delete-zone.tooltip-delete-active {
+  background: linear-gradient(135deg, var(--color-danger-dark) 0%, var(--color-danger) 100%);
+  border-color: #ff0000;
+  box-shadow: 0 0 30px rgba(255, 0, 0, 0.4), inset 0 0 20px rgba(255, 255, 255, 0.1);
+  transform: scale(1.02);
+}
+
+.delete-icon {
+  font-size: 28px;
+}
+
+.delete-text {
+  font-size: var(--font-size-sm);
+  line-height: 1.4;
+  opacity: 0.95;
+}
+
+/* ============================================
+   TOOLTIP OVERLAY
+   ============================================ */
+.tooltips-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 20;
+}
+
+/* ============================================
+   TOOLTIP TEXT (TEXTBOX EDITABLE)
+   ============================================ */
+.tooltip-text-overlay {
+  position: fixed;
+  background: var(--color-overlay-dark);
+  color: white;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  line-height: 1.4;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  max-width: 200px;
+  width: max-content;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  border: 1px solid #000;
+
+  /* âœ… DEFAULT: z-index basso (dietro ai point) */
+  z-index: 3000;
+}
+
+.tooltip-text-overlay.tooltip-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* âœ… DURANTE DRAG: z-index gestito dinamicamente in JS */
+.tooltip-text-overlay.tooltip-dragging {
+  pointer-events: auto;
+}
+
+/* ============================================
+   TOOLTIP POINTS (CIRCLES)
+   ============================================ */
+.tooltip-point-overlay {
+  position: fixed;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  cursor: grab;
+  opacity: 0.6;
+  user-select: none;
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-base);
+  color: white;
+  filter: drop-shadow(0px 0px 2px rgba(0, 0, 0, 0.8));
+  transition: opacity var(--transition-fast);
+
+  /* âœ… DEFAULT: z-index basso (dietro ai textbox) */
+  z-index: 2000;
+}
+
+.tooltip-point-overlay:active {
+  cursor: grabbing;
+}
+
+/* âœ… Zone di hover invisibile attorno al cerchio */
+.tooltip-point-overlay::before {
+  content: '';
+  position: absolute;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: auto;
+}
+
+/* âœ… DURANTE DRAG: z-index gestito dinamicamente in JS */
+.tooltip-point-overlay.tooltip-dragging {
+  opacity: 1;
+}
+
+/* ============================================
+   TOOLTIP WRAPPER (HTML TOOLTIPS)
+   ============================================ */
+.tooltip-wrapper {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+.tooltip-text {
+  visibility: hidden;
+  background-color: var(--color-text);
+  color: #fff;
+  text-align: center;
+  border-radius: var(--radius-sm);
+  padding: var(--space-sm) var(--space-md);
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-size: var(--font-size-sm);
+  opacity: 0;
+  transition: opacity var(--transition-normal);
+  pointer-events: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.tooltip-text::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: var(--color-text) transparent transparent transparent;
+}
+
+.tooltip-wrapper:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 600px) {
+  .tooltip-text {
+    white-space: normal;
+    width: 150px;
+    left: auto;
+    right: -20px;
+    transform: none;
+  }
+
+  .tooltip-text::after {
+    left: auto;
+    right: 10px;
+  }
+}
+
+
+====
+styles/variables.css
+----
+/* ============================================
+   COLORS
+   ============================================ */
+:root {
+  --color-primary: #333;
+  --color-primary-light: #555;
+  --color-secondary: #2196f3;
+  --color-secondary-dark: #1976d2;
+  --color-success: #4caf50;
+  --color-success-dark: #45a049;
+  --color-warning: #ff9800;
+  --color-warning-dark: #f57c00;
+  --color-warning-alt: #ffb74d;
+  --color-danger: #ff6b6b;
+  --color-danger-dark: #ff4444;
+  --color-danger-alt: #ff8787;
+  --color-error: #f44336;
+  --color-text: #333;
+  --color-text-light: #999;
+  --color-bg: linear-gradient(135deg, #f5f5f5 0%, #e9e9e9 100%);
+  --color-bg-light: #f9f9f9;
+  --color-bg-white: white;
+  --color-border: #ddd;
+  --color-border-light: #eee;
+  --color-border-dark: #cc0000;
+  --color-shadow: rgba(0, 0, 0, 0.15);
+  --color-shadow-sm: rgba(0, 0, 0, 0.08);
+  --color-overlay-dark: rgba(0, 0, 0, 1);
+}
+
+/* ============================================
+   SPACING
+   ============================================ */
+:root {
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 16px;
+  --space-xl: 20px;
+  --space-2xl: 25px;
+  --space-3xl: 40px;
+}
+
+/* ============================================
+   TYPOGRAPHY
+   ============================================ */
+:root {
+  --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif;
+  --font-size-xs: 11px;
+  --font-size-sm: 12px;
+  --font-size-base: 13px;
+  --font-size-md: 14px;
+  --font-size-lg: 15px;
+  --font-weight-normal: 400;
+  --font-weight-semibold: 600;
+  --letter-spacing: 0.3px;
+}
+
+/* ============================================
+   SHADOWS
+   ============================================ */
+:root {
+  --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 8px 20px rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.15);
+  --shadow-toast: 0 8px 24px rgba(0, 0, 0, 0.15);
+  --shadow-input-focus: 0 0 0 2px rgba(51, 51, 51, 0.1);
+  --shadow-input-focus-lg: 0 0 0 3px rgba(51, 51, 51, 0.1);
+}
+
+/* ============================================
+   BORDER RADIUS
+   ============================================ */
+:root {
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-xl: 12px;
+}
+
+/* ============================================
+   TRANSITIONS
+   ============================================ */
+:root {
+  --transition-fast: 0.2s ease;
+  --transition-normal: 0.3s ease;
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+  }
+  to {
+    opacity: 1;
+    max-height: 500px;
+  }
+}
+
+@keyframes slideInToast {
+  from {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutToast {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+}
+
+

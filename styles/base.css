@@ -1,0 +1,90 @@
+/* ============================================
+   RESET & NORMALIZATION
+   ============================================ */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: var(--space-xl);
+  background: var(--color-bg);
+  min-height: 100vh;
+  font-family: var(--font-family);
+  color: var(--color-text);
+}
+
+/* ============================================
+   TYPOGRAPHY
+   ============================================ */
+h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+  font-weight: var(--font-weight-semibold);
+}
+
+p {
+  margin: 0;
+}
+
+a {
+  color: var(--color-secondary);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+a:hover {
+  color: var(--color-secondary-dark);
+}
+
+code {
+  font-family: "Courier New", monospace;
+}
+
+/* ============================================
+   FORM ELEMENTS (BASE)
+   ============================================ */
+input[type="text"],
+input[type="number"],
+input[type="color"],
+select,
+textarea {
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  transition: border-color var(--transition-fast);
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+input[type="color"]:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+button {
+  padding: 11px 16px;
+  font-size: var(--font-size-base);
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-weight: var(--font-weight-semibold);
+  transition: all var(--transition-normal);
+  white-space: nowrap;
+  text-align: center;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ============================================
+   UTILITY
+   ============================================ */
+.hidden {
+  display: none;
+}

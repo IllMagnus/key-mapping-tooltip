@@ -1,0 +1,110 @@
+/* ============================================
+   EDITOR RESIZE PANEL
+   ============================================ */
+.editor-resize-panel {
+  background: var(--color-bg-light);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  animation: slideDown var(--transition-normal);
+}
+
+.editor-resize-panel.hidden {
+  display: none;
+}
+
+/* ============================================
+   RESIZE INPUTS
+   ============================================ */
+.editor-resize-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.editor-resize-input-group {
+  display: flex;
+  gap: var(--space-sm);
+  align-items: center;
+}
+
+.editor-resize-input-group label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+  min-width: 110px;
+  white-space: nowrap;
+}
+
+.editor-resize-input-group input {
+  width: 100%;
+  padding: var(--space-sm) var(--space-md);
+  font-size: var(--font-size-sm);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  transition: border-color var(--transition-fast);
+}
+
+.editor-resize-input-group input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-input-focus);
+}
+
+/* ============================================
+   EDITOR BUTTONS
+   ============================================ */
+.editor-btn-lock {
+  background: var(--color-secondary);
+  color: white;
+  width: 100%;
+  font-size: var(--font-size-sm);
+  padding: 10px 12px;
+  box-shadow: 0 2px 8px rgba(33, 150, 243, 0.2);
+}
+
+.editor-btn-lock:hover {
+  background: var(--color-secondary-dark);
+  box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+}
+
+.editor-btn-lock.editor-active {
+  background: linear-gradient(135deg, var(--color-warning) 0%, var(--color-warning-alt) 100%);
+  box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);
+}
+
+.editor-resize-actions {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.editor-btn-apply {
+  flex: 1;
+  background: var(--color-success);
+  color: white;
+  padding: 10px 12px;
+  font-size: var(--font-size-sm);
+  box-shadow: 0 2px 8px rgba(76, 175, 80, 0.2);
+}
+
+.editor-btn-apply:hover {
+  background: var(--color-success-dark);
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+}
+
+.editor-btn-reset {
+  flex: 1;
+  background: var(--color-warning);
+  color: white;
+  padding: 10px 12px;
+  font-size: var(--font-size-sm);
+  box-shadow: 0 2px 8px rgba(255, 152, 0, 0.2);
+}
+
+.editor-btn-reset:hover {
+  background: var(--color-warning-dark);
+  box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);
+}
