@@ -22,7 +22,9 @@ def collect_project_files(output_file="project_files.txt"):
     """
     
     # Ottieni il percorso dello script
-    script_dir = Path(__file__).parent.absolute()
+    script_dir = Path(__file__).parent.parent.absolute()    # project root
+    scratch_dir = Path(__file__).parent.absolute()          # _scratch/
+    output_path = scratch_dir / output_file
     
     # Definisci i percorsi
     index_path = script_dir / "index.html"
@@ -41,8 +43,8 @@ def collect_project_files(output_file="project_files.txt"):
         print(f"⚠️  Attenzione: {styles_dir} non trovato")
     
     # Apri il file di output
-    with open(script_dir / output_file, "w", encoding="utf-8") as outfile:
-        outfile.write("tutti i file del progetto image-annotator:\n\n")
+    with open(output_path, "w", encoding="utf-8") as outfile:
+        outfile.write("tutti i file del progetto key-mapping-tooltip:\n\n")
         
         # 1. Scrivi index.html
         print("📝 Elaborazione index.html...")
@@ -78,8 +80,7 @@ def collect_project_files(output_file="project_files.txt"):
                 with open(css_file, "r", encoding="utf-8") as f:
                     outfile.write(f.read())
                 outfile.write("\n\n")
-    
-    output_path = script_dir / output_file
+
     print(f"\n✅ File creato con successo: {output_path}")
     print(f"📊 Dimensione: {output_path.stat().st_size:,} bytes")
 

@@ -127,9 +127,10 @@ def recreate_project_from_file(input_file="progetto_completo.txt"):
     """
     
     # Ottieni il percorso dello script
-    script_dir = Path(__file__).parent.absolute()
-    input_path = script_dir / input_file
-    
+    scratch_dir = Path(__file__).parent.absolute()          # _scratch/
+    project_root = Path(__file__).parent.parent.absolute()  # root progetto
+    input_path = scratch_dir / input_file
+
     # Verifica che il file esista
     if not input_path.exists():
         print(f"❌ Errore: {input_path} non trovato")
@@ -172,7 +173,7 @@ def recreate_project_from_file(input_file="progetto_completo.txt"):
             continue
         
         # Determina il percorso di destinazione
-        dest_path = script_dir / file_path
+        dest_path = project_root / file_path
         
         # Crea le cartelle se necessarie
         dest_path.parent.mkdir(parents=True, exist_ok=True)
@@ -236,7 +237,7 @@ def recreate_project_from_file(input_file="progetto_completo.txt"):
             print(f"  {error}")
     
     print(f"\n✅ Cartelle create: ./js/ e ./styles/")
-    print(f"📍 Posizione: {script_dir}")
+    print(f"📍 Posizione: {project_root}")
 
 
 if __name__ == "__main__":
